@@ -1,3 +1,34 @@
+<?php
+session_start();
+
+$_SESSION['role_utilisateur'] = "visiteur";
+include "../db_connect.php";
+
+if (
+    isset($_SESSION['role_utilisateur'], $_SESSION['logged_in']) &&
+    $_SESSION['role_utilisateur'] === "visiteur" &&
+    $_SESSION['logged_in'] === TRUE
+) {
+    $id_utilisateur = htmlspecialchars($_SESSION['id_utilisateur']);
+    $nom_utilisateur = htmlspecialchars($_SESSION['nom_utilisateur']);
+    $role_utilisateur = htmlspecialchars($_SESSION['role_utilisateur']);
+
+
+    $sql = " select * from  animaux order by rand() limit 2";
+    $resultat = $conn->query($sql);
+
+    $array_animaux = array();
+    while ($ligne =  $resultat->fetch_assoc())
+        array_push($array_animaux, $ligne);
+} else {
+    header("Location: ../connexion.php?error=access_denied");
+    exit();
+}
+
+
+
+?>
+
 <!DOCTYPE html>
 <html class="light" lang="fr">
 
@@ -55,18 +86,15 @@
                 <div class="hidden lg:flex flex-1 justify-end gap-8">
                     <div class="flex items-center gap-9">
                         <a class="text-primary text-sm font-bold hover:text-primary transition-colors"
-                            href="index.html">Accueil</a>
+                            href="index.php">Accueil</a>
                         <a class="text-[#1b140d] text-sm font-medium hover:text-primary transition-colors"
-                            href="animaux.html">Animaux</a>
+                            href="animaux.php">Animaux</a>
                         <a class="text-[#1b140d] text-sm font-medium hover:text-primary transition-colors"
-                            href="reservation.html">Réservation</a>
+                            href="reservation.php">Réservation</a>
                         <a class="text-[#1b140d] text-sm font-medium hover:text-primary transition-colors"
-                            href="#">CAN 2025</a>
+                            href="./mes_reservations.php">mes reservations</a>
                     </div>
-                    <a href="connexion.html"
-                        class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-primary hover:bg-orange-600 transition-colors text-white text-sm font-bold leading-normal tracking-[0.015em]">
-                        <span class="truncate">Connexion</span>
-                    </a>
+
                 </div>
                 <button class="lg:hidden text-[#1b140d]">
                     <span class="material-symbols-outlined">menu</span>
@@ -78,7 +106,7 @@
     <main class="flex-grow flex flex-col items-center">
         <div id="top" class="w-full max-w-[1200px] px-4 md:px-10 py-6">
             <div class="rounded-3xl overflow-hidden relative min-h-[450px] flex flex-col justify-center items-center text-center p-8 bg-cover bg-center shadow-xl shadow-primary/10"
-                style='background-image: linear-gradient(rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.7) 100%), url("https://images.unsplash.com/photo-1546182990-dffeafbe841d?ixlib=rb-4.0.3&auto=format&fit=crop&w=1200&q=80");'>
+                style='background-image: linear-gradient(rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.7) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuB7tV0MbXCZTrttbfuFt8CqKgYEiMryvuxkVWJ6WjvseE_KC2bRS8wOCXpRA4lgDfHgikgjgeCdHsMWdoTr4UFYTYVRoaXexOq-BoOXf5Yo4UcENg5bt1enOCEyrAifv40q_DFANZ1CKEoehRrYDWpLP4S40C7IO1NzrxJat8xe6LbEld6MWZxqsFZoxikvEa865GjFKpz8yY8X5kFjlAlJsm2eNUry4Us0zUZHNEz_wQNZStdhBmsEhv7mpEWzSrjunYXj4bxh4v0h");'>
                 <span
                     class="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-white/20 backdrop-blur-sm border border-white/30 text-white text-sm font-bold uppercase tracking-wider mb-4">
                     <span class="material-symbols-outlined text-base">rocket_launch</span>
@@ -91,12 +119,12 @@
                     Explorez la faune africaine, soutenez la conservation et réservez votre visite guidée en direct.
                 </p>
                 <div class="flex gap-4">
-                    <a href="reservation.html"
+                    <a href="reservation.php"
                         class="h-12 px-6 bg-primary hover:bg-orange-600 text-white font-bold rounded-xl transition-all shadow-lg shadow-orange-500/30 flex items-center gap-2">
                         <span class="material-symbols-outlined">confirmation_number</span>
                         Réserver une Visite
                     </a>
-                    <a href="animaux.html"
+                    <a href="animaux.php"
                         class="h-12 px-6 bg-white hover:bg-gray-100 text-[#1b140d] font-bold rounded-xl transition-all shadow-lg flex items-center gap-2">
                         <span class="material-symbols-outlined">pets</span>
                         Voir tous les Animaux
@@ -110,66 +138,29 @@
             <p class="text-center text-gray-500 mb-8">Cliquez pour voir les fiches détaillées de nos espèces emblématiques.</p>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <div class="bg-white rounded-xl overflow-hidden shadow-lg group flex items-center border border-[#f3ede7]">
-                    <img src="https://images.unsplash.com/photo-1546182990-dffeafbe841d?auto=format&fit=crop&w=300&q=80" alt="Lion d'Afrique"
-                        class="w-32 h-32 object-cover shrink-0 group-hover:scale-105 transition-transform duration-300" />
-                    <div class="p-4 flex-grow">
-                        <h3 class="text-xl font-bold text-[#1b140d]">Lion d'Afrique</h3>
-                        <p class="text-gray-500 text-sm mb-3">Découvrez son habitat et son statut de conservation.</p>
-                        <a href="animaux.html" class="text-primary text-sm font-bold hover:underline">
-                            Voir la fiche complète →
-                        </a>
+                <?php foreach ($array_animaux as $animal) : ?>
+                    <div class="bg-white rounded-xl overflow-hidden shadow-lg group flex items-center border border-[#f3ede7]">
+                        <img src="<?= htmlspecialchars($animal['image_url']) ?>" alt="<?= htmlspecialchars($animal['nom_animal']) ?>"
+                            class="w-32 h-32 object-cover shrink-0 group-hover:scale-105 transition-transform duration-300" />
+                        <div class="p-4 flex-grow">
+                            <h3 class="text-xl font-bold text-[#1b140d]"><?= htmlspecialchars($animal['nom_animal']) ?></h3>
+                            <p class="text-gray-500 text-sm mb-3">Découvrez son habitat et son statut de conservation.</p>
+                            <a href="animal_detail.php?id=<?= htmlspecialchars($animal['id_animal']) ?>" class="text-primary text-sm font-bold hover:underline">
+                                Voir la fiche complète &rarr;
+                            </a>
+                        </div>
                     </div>
-                </div>
-                <div class="bg-white rounded-xl overflow-hidden shadow-lg group flex items-center border border-[#f3ede7]">
-                    <img src="https://images.unsplash.com/photo-1516467508483-a7212febe31a?auto=format&fit=crop&w=300&q=80" alt="Éléphant de la savane"
-                        class="w-32 h-32 object-cover shrink-0 group-hover:scale-105 transition-transform duration-300" />
-                    <div class="p-4 flex-grow">
-                        <h3 class="text-xl font-bold text-[#1b140d]">Éléphant de la savane</h3>
-                        <p class="text-gray-500 text-sm mb-3">Découvrez son habitat et son statut de conservation.</p>
-                        <a href="animaux.html" class="text-primary text-sm font-bold hover:underline">
-                            Voir la fiche complète →
-                        </a>
-                    </div>
-                </div>
+                <?php endforeach; ?>
             </div>
-            
             <div class="text-center mt-8">
-                <a href="animaux.html" class="inline-flex items-center justify-center gap-2 px-6 py-3 border border-[#e5e5e5] hover:border-primary text-[#1b140d] hover:text-primary font-bold rounded-xl transition-all bg-white hover:bg-orange-50">
-                    Voir la liste complète
+                <a href="animaux.php" class="inline-flex items-center justify-center gap-2 px-6 py-3 border border-[#e5e5e5] hover:border-primary text-[#1b140d] hover:text-primary font-bold rounded-xl transition-all bg-white hover:bg-orange-50">
+                    Voir la liste complète (<?= count($array_animaux) * 4 ?> animaux)
                     <span class="material-symbols-outlined">arrow_forward</span>
                 </a>
             </div>
         </section>
 
-        <section class="w-full max-w-[1200px] px-4 md:px-10 py-10 bg-primary/10 rounded-xl mb-12">
-            <h2 class="text-3xl font-extrabold text-[#1b140d] mb-4 text-center">Visites Guidées en Direct</h2>
-            <p class="text-center text-gray-700 mb-8">Réservez votre place pour nos sessions de découverte exclusives.</p>
-            <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-                <div class="p-5 bg-white rounded-xl shadow-lg border border-[#f3ede7] text-center">
-                    <span class="material-symbols-outlined text-4xl text-green-600 mb-2">schedule</span>
-                    <h3 class="font-bold text-lg">Prochaine Session :</h3>
-                    <p class="text-primary font-bold">Le Grand Safari (20/12)</p>
-                </div>
-                <div class="p-5 bg-white rounded-xl shadow-lg border border-[#f3ede7] text-center">
-                    <span class="material-symbols-outlined text-4xl text-blue-600 mb-2">person</span>
-                    <h3 class="font-bold text-lg">Guide du Jour :</h3>
-                    <p class="text-primary font-bold">Yasmine Belkadi</p>
-                </div>
-                <div class="p-5 bg-white rounded-xl shadow-lg border border-[#f3ede7] text-center">
-                    <span class="material-symbols-outlined text-4xl text-orange-600 mb-2">paid</span>
-                    <h3 class="font-bold text-lg">Prix d'entrée :</h3>
-                    <p class="text-primary font-bold">À partir de 4€</p>
-                </div>
-            </div>
-            <div class="text-center mt-8">
-                <a href="reservation.html"
-                    class="inline-flex items-center justify-center gap-2 px-6 py-3 bg-primary hover:bg-orange-600 text-white font-bold rounded-xl transition-all shadow-lg shadow-orange-500/30">
-                    <span class="material-symbols-outlined">confirmation_number</span>
-                    Voir toutes les visites & Réserver
-                </a>
-            </div>
-        </section>
+     
 
     </main>
 
@@ -190,8 +181,8 @@
                 <div>
                     <h4 class="font-bold mb-4 text-white">Explorer</h4>
                     <ul class="space-y-3 text-gray-400 text-sm">
-                        <li><a class="hover:text-primary transition-colors" href="animaux.html">Nos Animaux</a></li>
-                        <li><a class="hover:text-primary transition-colors" href="reservation.html">Réservation Visites</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="animaux.php">Nos Animaux</a></li>
+                        <li><a class="hover:text-primary transition-colors" href="reservation.php">Réservation Visites</a></li>
                         <li><a class="hover:text-primary transition-colors" href="#">Programme Éducatif</a></li>
                     </ul>
                 </div>
