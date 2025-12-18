@@ -11,7 +11,7 @@ $id_guide = $_SESSION['id_utilisateur'];
 
 if (isset($_GET['id']) && !empty($_GET['id'])) {
     $id_visite = intval($_GET['id']);
-
+ 
     try {
         $sqlEtapes = "DELETE FROM etapesvisite WHERE id_visite = ?";
         $stmtEtapes = $conn->prepare($sqlEtapes);

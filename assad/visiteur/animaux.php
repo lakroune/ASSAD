@@ -19,12 +19,44 @@
         while ($ligne =  $resultat->fetch_assoc())
             array_push($array_habitats, $ligne);
 
-        $sql = " select * from  animaux a inner join  habitats h on a.id_habitat =h.id_habitat  ";
-        $resultat = $conn->query($sql);
-
         $array_animaux = array();
-        while ($ligne =  $resultat->fetch_assoc())
-            array_push($array_animaux, $ligne);
+
+        $sql = "SELECT a.*, h.nom_habitat 
+        FROM animaux a 
+        JOIN habitats h ON a.id_habitat = h.id_habitat 
+        WHERE 1=1 ";
+
+
+        $numAnimaux = 5;
+        if ($_SERVER['REQUEST_METHOD'] === 'POST' and isset($_POST["chargerplus"])) {
+            if (!empty($_POST["chargerplus"])) {
+                $numAnimaux += $_POST["chargerplus"];
+                $sql .= " limit 5 OFFSET  $numAnimaux";
+            }
+        }
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+            if (!empty($_POST['search'])) {
+                $sql .= " AND a.nom_animal LIKE '" . $_POST['search'] . "%'";
+            }
+
+            if (!empty($_POST['id_habitat'])) {
+                $sql .= " AND a.id_habitat = " . $_POST['id_habitat'];
+            }
+
+            if (!empty($_POST['alimentation_animal'])) {
+                $sql .= " AND a.alimentation_animal = '" . $_POST['alimentation_animal'] . "'";
+            }
+        } else  $sql .= " limit 5 ";
+
+
+        try {
+            $resultat = $conn->query($sql);
+            while ($ligne =  $resultat->fetch_assoc())
+                array_push($array_animaux, $ligne);
+        } catch (Exception $e) {
+            error_log(date('Y-m-d H:i:s') . " - Erreur Recherche Animaux -: " . $e->getMessage() . PHP_EOL, 3, "../error.log");
+        }
     } else {
         header("Location: ../connexion.php?error=access_denied");
         exit();
@@ -32,43 +64,6 @@
 
 
 
-
-    $sql = "SELECT a.*, h.nom_habitat 
-        FROM animaux a 
-        JOIN habitats h ON a.id_habitat = h.id_habitat 
-        WHERE 1=1";
-
-
-
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-        if (!empty($_POST['search'])) {
-            $sql .= " AND a.nom_animal LIKE '" . $_POST['search'] . "%'";
-        }
-
-        // filter par Habitat
-        if (!empty($_POST['id_habitat'])) {
-            $sql .= " AND a.id_habitat = " . $_POST['id_habitat'];
-        }
-
-        // Filtre par typr alimentation
-        if (!empty($_POST['alimentation_animal'])) {
-            $sql .= " AND a.alimentation_animal = '" . $_POST['alimentation_animal'] . "'";
-        }
-    }
-
-    try {
-        $resultat = $conn->query($sql);
-        $array_animaux = array();
-        while ($ligne =  $resultat->fetch_assoc())
-            array_push($array_animaux, $ligne);
-    } catch (Exception $e) {
-
-        error_log(date('Y-m-d H:i:s') . " - Erreur Recherche Animaux : " . $e->getMessage() . PHP_EOL, 3, "../error.log");
-        $array_animaux = array();
-        while ($ligne =  $resultat->fetch_assoc())
-            array_push($array_animaux, $ligne);
-    }
     ?>
 
 
@@ -171,7 +166,7 @@
                          <a class="text-[#1b140d] text-sm font-medium hover:text-primary transition-colors"
                              href="reservation.php">Réservation</a>
                          <a class="text-[#1b140d] text-sm font-medium hover:text-primary transition-colors"
-                             href="#">CAN 2025</a>
+                             href="./mes_reservations.php">Mes Reservations</a>
                      </div>
 
                  </div>
@@ -183,7 +178,7 @@
      </header>
 
      <main class="flex-grow flex flex-col items-center">
-         <div class="w-full max-w-[1200px] px-4 md:px-10 py-6">
+         <!-- <div class="w-full max-w-[1200px] px-4 md:px-10 py-6">
              <div
                  class="rounded-xl overflow-hidden relative min-h-[250px] flex flex-col justify-center items-center text-center p-8 bg-cover bg-center shadow-xl shadow-primary/10"
                  style='background-image: linear-gradient(rgba(0, 0, 0, 0.4) 0%, rgba(0, 0, 0, 0.7) 100%), url("https://lh3.googleusercontent.com/aida-public/AB6AXuB7tV0MbXCZTrttbfuFt8CqKgYEiMryvuxkVWJ6WjvseE_KC2bRS8wOCXpRA4lgDfHgikgjgeCdHsMWdoTr4UFYTYVRoaXexOq-BoOXf5Yo4UcENg5bt1enOCEyrAifv40q_DFANZ1CKEoehRrYDWpLP4S40C7IO1NzrxJat8xe6LbEld6MWZxqsFZoxikvEa865GjFKpz8yY8X5kFjlAlJsm2eNUry4Us0zUZHNEz_wQNZStdhBmsEhv7mpEWzSrjunYXj4bxh4v0h");'>
@@ -195,7 +190,7 @@
                      Explorez notre collection complète d'animaux, classés par habitat et statut de conservation.
                  </p>
              </div>
-         </div>
+         </div> -->
 
          <form action="" method="POST" class="w-full max-w-[1200px] px-4 md:px-10 sticky top-[65px] z-40">
              <div class="bg-white/80 backdrop-blur-xl shadow-sm border border-[#f3ede7] rounded-xl p-4 mb-8">
@@ -218,7 +213,7 @@
                          </select>
                          <select name="alimentation_animal"
                              class="px-4 py-2 bg-white border border-[#e5e5e5] hover:border-primary/50 hover:bg-primary/5 text-[#1b140d] rounded-lg text-sm font-medium whitespace-nowrap transition-all focus:ring-primary focus:border-primary w-full sm:w-1/2">
-                             <option value="Tout-Type-Alimentaire" selected>Tout Type Alimentaire</option>
+                             <option value="" selected>Tout Type Alimentaire</option>
                              <option value="Carnivore">Carnivore</option>
                              <option value="Herbivore">Herbivore</option>
                              <option value="Omnivore">Omnivore</option>
@@ -228,12 +223,12 @@
              </div>
          </form>
 
-         <div class="w-full max-w-[1200px] px-4 md:px-10 mb-6 flex justify-between items-end">
+         <!-- <div class="w-full max-w-[1200px] px-4 md:px-10 mb-6 flex justify-between items-end">
              <div>
                  <h2 class="text-[#1b140d] text-2xl font-bold leading-tight">Liste des Animaux</h2>
-                 <p class="text-gray-500 text-sm mt-1">Total: <?= count($array_animaux) ?> animaux répertoriés</p>
+                 <p class="text-gray-500 text-sm mt-1">Total: <?php count($array_animaux) ?> animaux répertoriés</p>
              </div>
-         </div>
+         </div> -->
 
          <div class="w-full max-w-[1200px] px-4 md:px-10 pb-20">
              <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 xl:grid-cols-5 gap-6">
@@ -251,7 +246,7 @@
                         }
                         ?>
 
-                     <?php if ($index === 0) :
+                     <?php if ($index === 0 && strtolower(trim($animal["nom_animal"])) ==  strtolower("Lion d'Atlas")) :
                         ?>
                          <div class="group  relative flex flex-col bg-white rounded-2xl border-2 border-primary overflow-hidden hover:shadow-xl transition-all duration-300 col-span-1 sm:col-span-2 lg:col-span-2">
                              <div class="absolute top-4 left-4 z-10">
@@ -284,7 +279,7 @@
                          <div class="group flex flex-col bg-white rounded-2xl border border-[#f3ede7] overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
                              <a href="animal_detail.php?id=<?= htmlspecialchars($animal['id_animal']) ?>" class="h-48 overflow-hidden relative">
                                  <img alt="<?= htmlspecialchars($animal['nom_animal']) ?>" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="<?= htmlspecialchars($animal['image_url']) ?>" />
-                                  
+
                              </a>
                              <div class="p-4 flex flex-col flex-grow">
                                  <div class="flex items-start justify-between mb-2">
@@ -319,13 +314,19 @@
                  <?php endforeach; ?>
              </div>
 
-             <div class="flex justify-center mt-12">
-                 <button
-                     class="flex items-center justify-center gap-2 px-6 py-3 border border-[#e5e5e5] hover:border-primary text-[#1b140d] hover:text-primary font-bold rounded-xl transition-all bg-white hover:bg-orange-50">
-                     Charger plus d'animaux
-                     <span class="material-symbols-outlined">expand_more</span>
-                 </button>
-             </div>
+             <?php
+                if (count($array_animaux) == 5)
+                    echo ' <div class="flex justify-center mt-12">
+                        <form action="" method="POST">
+                            <input type="hidden" value="' . $numAnimaux . '" name="chargerplus">
+                            <button
+                                class="flex items-center justify-center gap-2 px-6 py-3 border border-[#e5e5e5] hover:border-primary text-[#1b140d] hover:text-primary font-bold rounded-xl transition-all bg-white hover:bg-orange-50">
+                                Charger plus d\'animaux
+                                <span class="material-symbols-outlined">expand_more</span>
+                            </button>
+                        </form>
+                    </div>';
+                ?>
          </div>
      </main>
 
