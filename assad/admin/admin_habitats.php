@@ -23,7 +23,25 @@
 
 
 
-        if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['id_habitats'])) {
+        $info_habitat = null;
+        $info = false;
+        $edit = false;
+        if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST['id_habitat_info']) or isset($_POST['id_habitat_edit']))) {
+            $id_h = null;
+            if (!empty($_POST['id_habitat_info'])) {
+                $info = true;
+                $id_h = $_POST['id_habitat_info'];
+            }
+            if (!empty($_POST['id_habitat_edit'])) {
+                $edit = true;
+                $id_h = $_POST['id_habitat_edit'];
+            }
+            $sql_info = "SELECT * FROM habitats WHERE id_habitat = ?";
+            $stmt = $conn->prepare($sql_info);
+            $stmt->bind_param("i", $id_h);
+            $stmt->execute();
+            $res = $stmt->get_result();
+            $info_habitat = $res->fetch_assoc();
         }
     } else {
 
@@ -145,7 +163,7 @@
                          </p>
                      </div>
                      <div class="flex items-center gap-3">
-                         <button onclick=" toggleModal() ;"
+                         <button onclick=" toggleModal('modalHabitat') ;"
                              class="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-600/30 transition-all text-sm font-bold">
                              <span class="material-symbols-outlined text-lg">add_location_alt</span>
                              Ajouter Nouvel Habitat
@@ -224,14 +242,16 @@
                                                  class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
 
 
-                                                 <button
-                                                     class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-blue-500"
-                                                     title="Éditer les détails">
-                                                     <span class="material-symbols-outlined text-lg">edit</span>
-                                                 </button>
+                                                 <form class="edit" action="" method="POST">
+                                                     <input type="hidden" value="<?= $habitat['id_habitat'] ?>" name="id_habitat_edit">
+                                                     <button
+                                                         class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-blue-500"
+                                                         title="Éditer les détails">
+                                                         <span class="material-symbols-outlined text-lg">edit</span>
+                                                     </button>
+                                                 </form>
                                                  <form class="info" action="" method="POST">
-                                                     <input type="hidden" value="<?= $habitat['id_habitat'] ?>" name="id_habitat">
-                                                     <!-- button pour affiche  pop up les information sur  habitat -->
+                                                     <input type="hidden" value="<?= $habitat['id_habitat'] ?>" name="id_habitat_info">
                                                      <button
                                                          class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-primary"
                                                          title="Voir les animaux résidents">
@@ -242,7 +262,7 @@
                                                      <input type="hidden" value="<?= $habitat['id_habitat'] ?>" name="id_habitat">
                                                      <button
                                                          type="button"
-                                                         class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-red-500"
+                                                         class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-red-500 btn-delete"
                                                          title="Supprimer">
                                                          <span class="material-symbols-outlined text-lg">delete</span>
                                                      </button>
@@ -268,7 +288,7 @@
          <div class="bg-surface-light dark:bg-surface-dark w-full max-w-md p-6 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-800">
              <div class="flex justify-between items-center mb-6">
                  <h2 class="text-xl font-bold">Nouvel Habitat</h2>
-                 <button onclick="toggleModal()" class="text-gray-500 hover:text-red-500">
+                 <button onclick="toggleModal('modalHabitat')" class="text-gray-500 hover:text-red-500">
                      <span class="material-symbols-outlined">close</span>
                  </button>
              </div>
@@ -308,7 +328,7 @@
                  </div>
 
                  <div class="mt-2 flex gap-3">
-                     <button type="button" onclick="toggleModal()"
+                     <button type="button" onclick="toggleModal('modalHabitat')"
                          class="flex-1 py-2 text-sm font-bold border border-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
                          Annuler
                      </button>
@@ -320,16 +340,45 @@
              </form>
          </div>
      </div>
-     <!-- ajouter model pour affiche info de habitat -->
+     <?php if ($info): ?>
+         <div id="modalInfoHabitat" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+             <div class="bg-surface-light dark:bg-surface-dark w-full max-w-lg p-8 rounded-2xl shadow-2xl border border-primary/20">
+                 <div class="flex justify-between items-start mb-6">
+                     <div>
+                         <p class="text-primary font-bold text-xs uppercase tracking-widest">Détails de l'habitat</p>
+                         <h2 class="text-3xl font-black"><?= htmlspecialchars($info_habitat['nom_habitat']) ?></h2>
+                     </div>
+                     <button onclick="closeInfoModal()" class="bg-gray-100 dark:bg-gray-800 p-2 rounded-full hover:text-red-500 transition-colors">
+                         <span class="material-symbols-outlined">close</span>
+                     </button>
+                 </div>
+                 <div class="grid grid-cols-2 gap-4 mb-6">
+                     <div class="p-4 bg-gray-50 dark:bg-background-dark rounded-xl">
+                         <p class="text-xs text-text-secondary-light">Climat</p>
+                         <p class="font-bold"><?= htmlspecialchars($info_habitat['type_climat']) ?></p>
+                     </div>
+                     <div class="p-4 bg-gray-50 dark:bg-background-dark rounded-xl">
+                         <p class="text-xs text-text-secondary-light">Zone géographique</p>
+                         <p class="font-bold"><?= htmlspecialchars($info_habitat['zone_zoo']) ?></p>
+                     </div>
+                 </div>
+                 <div class="mb-8">
+                     <p class="text-xs text-text-secondary-light mb-2">Description complète</p>
+                     <p class="text-sm leading-relaxed italic text-text-secondary-dark">
+                         "<?= nl2br(htmlspecialchars($info_habitat['description_habitat'])) ?>"
+                     </p>
+                 </div>
+                 <button onclick="closeInfoModal()" class="w-full py-3 bg-primary text-white font-bold rounded-xl">Fermer</button>
+             </div>
+         </div>
+     <?php endif; ?>
      <script>
          document.getElementById('card_habitas').addEventListener('click', (e) => {
-             const ele_click = e.target;
-             if (ele_click.tagName === 'SPAN') {
-                 const form = ele_click.closest('form.delete');
-                 if (form)
-                     if (confirm("veullez vous"))
-                         form.submit();
-
+             const btnDelete = e.target.closest('.btn-delete');
+             if (btnDelete) {
+                 if (confirm("Voulez-vous vraiment supprimer cet habitat ?")) {
+                     btnDelete.closest('form').submit();
+                 }
              }
          });
          document.getElementById('card_habitas').addEventListener('click', (e) => {
@@ -344,16 +393,15 @@
          });
 
 
-         function toggleModal() {
-             const modal = document.getElementById('modalHabitat');
+         function toggleModal(id) {
+             const modal = document.getElementById(id);
              modal.classList.toggle('hidden');
              modal.classList.toggle('flex');
          }
 
-         function toggleModal_info() {
+         function closeInfoModal() {
              const modal = document.getElementById('modalInfoHabitat');
-             modal.classList.toggle('hidden');
-             modal.classList.toggle('flex');
+             if (modal) modal.remove(); // On le supprime du DOM car il est généré par PHP
          }
      </script>
  </body>
