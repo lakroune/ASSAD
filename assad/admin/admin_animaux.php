@@ -115,17 +115,8 @@
                  </nav>
              </div>
              <div class="border-t border-gray-200 dark:border-gray-800 pt-4 px-2">
-                 <div class="flex items-center gap-3">
-                     <div
-                         class="bg-gray-200 h-9 w-9 rounded-full flex items-center justify-center text-gray-500 font-bold text-xs overflow-hidden">
-                         <img alt="Admin profile" class="h-full w-full object-cover"
-                             data-alt="Portrait of a smiling man with glasses"
-                             src="https://lh3.googleusercontent.com/aida-public/AB6AXuDLpsL4U45kNe2pJTEnRso6tfRPA6aLzfj3_19OQE6427LVmJ5aiOc1ZRWmvboLsjGaNmK64pZi1jhhiR-v87OvRhal9yHiSxQvTiX-eipY5OBy7UKmVoRy-c_ZXvLyH0-CLxF8G1ng-sBh2jhO4Yf-eaj5B3UE6mv0ggcUeAMOn8OYOLPj8EBGQKb-92AiJo5VHKJHGnSSRxJMnzp3emTjiTzC3qYd_2iEed3MQVluydYS0yi194Z_ztMxCH_6roaeCDAm0hQHwnIW" />
-                     </div>
-                     <div class="flex flex-col">
-                         <p class="text-sm font-medium text-text-light dark:text-text-dark"><?= $nom_utilisateur ?></p>
-                         <p class="text-xs text-text-secondary-light dark:text-text-secondary-dark">Super Admin</p>
-                     </div>
+                 <div class="flex flex-col">
+                     <a href="../php/sedeconnecter.php" class="text-xs text-text-secondary-light dark:text-text-secondary-dark">se deconnecter</a>
                  </div>
              </div>
          </div>

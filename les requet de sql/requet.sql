@@ -143,3 +143,4 @@ SELECT * FROM utilisateurs where email ="admin@admin" ;
 
 SELECT  COUNT(*) as count FROM visitesguidees  ;
 SELECT  COUNT(*) as count FROM reservations  ;
+SELECT  *  FROM habitats  ;
