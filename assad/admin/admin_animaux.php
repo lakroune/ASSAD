@@ -112,12 +112,7 @@
                              class="material-symbols-outlined text-2xl group-hover:text-primary transition-colors">group</span>
                          <span class="text-sm font-medium">Utilisateurs</span>
                      </a>
-                     <a class="flex items-center gap-3 px-3 py-2.5 rounded-lg text-text-secondary-light dark:text-text-secondary-dark hover:bg-primary/10 hover:text-primary transition-colors group"
-                         href="#">
-                         <span
-                             class="material-symbols-outlined text-2xl group-hover:text-primary transition-colors">settings</span>
-                         <span class="text-sm font-medium">Paramètres</span>
-                     </a>
+                     
                  </nav>
              </div>
              <div class="border-t border-gray-200 dark:border-gray-800 pt-4 px-2">
@@ -149,8 +144,7 @@
                          </p>
                      </div>
                      <div class="flex items-center gap-3">
-                         <button
-                             class="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-600/30 transition-all text-sm font-bold">
+                         <button onclick="toggleModal()" class="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-600/30 transition-all text-sm font-bold">
                              <span class="material-symbols-outlined text-lg">add</span>
                              Ajouter Nouvel Animal
                          </button>
@@ -300,103 +294,81 @@
 
          </div>
      </main>
-<div id="modalAnimal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-black/50 backdrop-blur-sm flex items-center justify-center p-4">
-    <div class="bg-surface-light dark:bg-surface-dark w-full max-w-lg rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700">
-        <div class="p-6 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
-            <h2 class="text-xl font-bold text-text-light dark:text-text-dark">Ajouter un Nouvel Animal</h2>
-            <button onclick="toggleModal()" class="text-gray-400 hover:text-red-500 transition-colors">
-                <span class="material-symbols-outlined">close</span>
-            </button>
-        </div>
+     <div id="modalAnimal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-black/50 backdrop-blur-sm flex  items-center justify-center p-4">
+         <div class="bg-surface-light dark:bg-surface-dark w-full max-w-lg rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700">
+             <div class="p-6 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
+                 <h2 class="text-xl font-bold text-text-light dark:text-text-dark">Ajouter un Nouvel Animal</h2>
+                 <button onclick="toggleModal()" class="text-gray-400 hover:text-red-500 transition-colors">
+                     <span class="material-symbols-outlined">close</span>
+                 </button>
+             </div>
 
-        <form id="formAddAnimal" class="p-6 space-y-4">
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-xs font-bold uppercase text-text-secondary-light mb-1">Nom</label>
-                    <input type="text" name="nom_animal" required class="w-full rounded-lg border-gray-200 dark:bg-background-dark dark:border-gray-700 text-sm">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold uppercase text-text-secondary-light mb-1">Espèce</label>
-                    <input type="text" name="espece" required class="w-full rounded-lg border-gray-200 dark:bg-background-dark dark:border-gray-700 text-sm">
-                </div>
-            </div>
+             <form id="formAddAnimal" method="POST" action="php/ajouter_animal.php" class="p-6 space-y-4">
+                 <div class="grid grid-cols-2 gap-4">
+                     <div>
+                         <label class="block text-xs font-bold uppercase text-text-secondary-light mb-1">Nom</label>
+                         <input type="text" name="nom_animal" required class="w-full rounded-lg border-gray-200 dark:bg-background-dark dark:border-gray-700 text-sm">
+                     </div>
+                     <div>
+                         <label class="block text-xs font-bold uppercase text-text-secondary-light mb-1">Espèce</label>
+                         <input type="text" name="espece" required class="w-full rounded-lg border-gray-200 dark:bg-background-dark dark:border-gray-700 text-sm">
+                     </div>
+                 </div>
 
-            <div>
-                <label class="block text-xs font-bold uppercase text-text-secondary-light mb-1">Alimentation</label>
-                <select name="alimentation_animal" class="w-full rounded-lg border-gray-200 dark:bg-background-dark dark:border-gray-700 text-sm">
-                    <option value="Carnivore">Carnivore</option>
-                    <option value="herbivore">Herbivore</option>
-                    <option value="omnivore">Omnivore</option>
-                </select>
-            </div>
+                 <div>
+                     <label class="block text-xs font-bold uppercase text-text-secondary-light mb-1">Alimentation</label>
+                     <select name="alimentation_animal" class="w-full rounded-lg border-gray-200 dark:bg-background-dark dark:border-gray-700 text-sm">
+                         <option value="Carnivore">Carnivore</option>
+                         <option value="herbivore">Herbivore</option>
+                         <option value="omnivore">Omnivore</option>
+                     </select>
+                 </div>
 
-            <div>
-                <label class="block text-xs font-bold uppercase text-text-secondary-light mb-1">URL de l'image</label>
-                <input type="url" name="image_url" placeholder="https://..." required class="w-full rounded-lg border-gray-200 dark:bg-background-dark dark:border-gray-700 text-sm">
-            </div>
+                 <div>
+                     <label class="block text-xs font-bold uppercase text-text-secondary-light mb-1">URL de l'image</label>
+                     <input type="url" name="image_url" placeholder="https://..." required class="w-full rounded-lg border-gray-200 dark:bg-background-dark dark:border-gray-700 text-sm">
+                 </div>
 
-            <div class="grid grid-cols-2 gap-4">
-                <div>
-                    <label class="block text-xs font-bold uppercase text-text-secondary-light mb-1">Pays d'origine</label>
-                    <input type="text" name="pays_origine" required class="w-full rounded-lg border-gray-200 dark:bg-background-dark dark:border-gray-700 text-sm">
-                </div>
-                <div>
-                    <label class="block text-xs font-bold uppercase text-text-secondary-light mb-1">Habitat</label>
-                    <select name="id_habitat" required class="w-full rounded-lg border-gray-200 dark:bg-background-dark dark:border-gray-700 text-sm">
-                        <?php 
-                        $res_h = $conn->query("SELECT id_habitat, nom_habitat FROM habitats");
-                        while($h = $res_h->fetch_assoc()): ?>
-                            <option value="<?= $h['id_habitat'] ?>"><?= htmlspecialchars($h['nom_habitat']) ?></option>
-                        <?php endwhile; ?>
-                    </select>
-                </div>
-            </div>
+                 <div class="grid grid-cols-2 gap-4">
+                     <div>
+                         <label class="block text-xs font-bold uppercase text-text-secondary-light mb-1">Pays d'origine</label>
+                         <input type="text" name="pays_origine" required class="w-full rounded-lg border-gray-200 dark:bg-background-dark dark:border-gray-700 text-sm">
+                     </div>
+                     <div>
+                         <label class="block text-xs font-bold uppercase text-text-secondary-light mb-1">Habitat</label>
+                         <select name="id_habitat" required class="w-full rounded-lg border-gray-200 dark:bg-background-dark dark:border-gray-700 text-sm">
+                             <?php
+                                $res_h = $conn->query("SELECT id_habitat, nom_habitat FROM habitats");
+                                while ($h = $res_h->fetch_assoc()): ?>
+                                 <option value="<?= $h['id_habitat'] ?>"><?= htmlspecialchars($h['nom_habitat']) ?></option>
+                             <?php endwhile; ?>
+                         </select>
+                     </div>
+                 </div>
 
-            <div>
-                <label class="block text-xs font-bold uppercase text-text-secondary-light mb-1">Description</label>
-                <textarea name="description_animal" rows="3" class="w-full rounded-lg border-gray-200 dark:bg-background-dark dark:border-gray-700 text-sm"></textarea>
-            </div>
+                 <div>
+                     <label class="block text-xs font-bold uppercase text-text-secondary-light mb-1">Description</label>
+                     <textarea name="description_animal" rows="3" class="w-full rounded-lg border-gray-200 dark:bg-background-dark dark:border-gray-700 text-sm"></textarea>
+                 </div>
 
-            <div class="pt-4 flex gap-3">
-                <button type="button" onclick="toggleModal()" class="flex-1 px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-bold">Annuler</button>
-                <button type="submit" class="flex-1 px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg text-sm font-bold shadow-lg shadow-primary/30 transition-all">Enregistrer</button>
-            </div>
-        </form>
-    </div>
-</div>
+                 <div class="pt-4 flex gap-3">
+                     <button type="button" onclick="toggleModal()" class="flex-1 px-4 py-2 border border-gray-200 dark:border-gray-700 rounded-lg text-sm font-bold">Annuler</button>
+                     <button type="submit" class="flex-1 px-4 py-2 bg-primary hover:bg-primary-dark text-white rounded-lg text-sm font-bold shadow-lg shadow-primary/30 transition-all">Enregistrer</button>
+                 </div>
+             </form>
+         </div>
+     </div>
 
 
-<script>
-function toggleModal() {
-    const modal = document.getElementById('modalAnimal');
-    modal.classList.toggle('hidden');
-    modal.classList.toggle('flex');
-}
+     <script>
+         function toggleModal() {
+             const modal = document.getElementById('modalAnimal');
+             modal.classList.toggle('hidden');
+             modal.classList.toggle('flex');
+         }
 
-document.getElementById('formAddAnimal').addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    const formData = new FormData(this);
-
-    fetch('api_ajouter_animal.php', {
-        method: 'POST',
-        body: formData
-    })
-    .then(response => response.json())
-    .then(data => {
-        if (data.success) {
-            alert('Animal ajouté avec succès !');
-            window.location.reload(); // Recharge pour voir le nouvel animal
-        } else {
-            alert('Erreur : ' + data.message);
-        }
-    })
-    .catch(error => {
-        console.error('Erreur:', error);
-        alert('Une erreur est survenue lors de l\'envoi.');
-    });
-});
-</script>
+         
+     </script>
  </body>
 
  </html>
