@@ -20,12 +20,19 @@
         $array_habitats = array();
         while ($ligne =  $resultat->fetch_assoc())
             array_push($array_habitats, $ligne);
+
+
+
+        if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_SESSION['id_habitats'])) {
+        }
     } else {
-        // Redirection de sécurité
+
         header("Location: connexion.php?error=access_denied");
         exit();
     }
     ?>
+
+
 
  <!DOCTYPE html>
  <html class="light" lang="fr">
@@ -222,7 +229,7 @@
                                                      title="Éditer les détails">
                                                      <span class="material-symbols-outlined text-lg">edit</span>
                                                  </button>
-                                                 <form class="" action="" method="POST">
+                                                 <form class="info" action="" method="POST">
                                                      <input type="hidden" value="<?= $habitat['id_habitat'] ?>" name="id_habitat">
                                                      <!-- button pour affiche  pop up les information sur  habitat -->
                                                      <button
