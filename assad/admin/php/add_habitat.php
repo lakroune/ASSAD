@@ -15,7 +15,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && $_SESSION['role_utilisateur'] === "a
     $stmt->bind_param("ssss", $nom, $climat, $description, $zone);
 
     if ($stmt->execute()) {
-        header("Location: ../admin_habitats.php?success=added");
+        header("Location: ../admin_habitats.php?status=added");
     } else {
         header("Location: ../admin_habitats.php?error=sql_error");
     }

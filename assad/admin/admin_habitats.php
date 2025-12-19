@@ -14,9 +14,14 @@
 
 
 
-        $sql = " SELECT  *  FROM habitats ";
-        $resultat = $conn->query($sql);
-
+        $sql = " SELECT  *  FROM habitats where nom_habitat like  ?";
+        $searchInput = "%";
+        if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['searchInput']))
+            $searchInput =  htmlspecialchars($_POST["searchInput"]) . "%";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $searchInput);
+        $stmt->execute();
+        $resultat = $stmt->get_result();
         $array_habitats = array();
         while ($ligne =  $resultat->fetch_assoc())
             array_push($array_habitats, $ligne);
@@ -180,16 +185,30 @@
                          <button class="px-4 py -2 text-sm font-bold rounded-lg bg-primary text-white shadow-sm">Tous (<?= count($array_habitats) ?>)</button>
                      </div>
                      <div class="relative w-full md:w-auto">
-                         <span
-                             class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm">search</span>
-                         <input
-                             class="pl-8 pr-3 py-1.5 rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-surface-dark text-sm w-full md:w-64 focus:ring-primary/20 focus:border-primary"
-                             placeholder="Rechercher par nom..." type="text" />
+                         <form action="" method="POST">
+                             <span
+                                 class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm">search</span>
+                             <input name="searchInput"
+                                 class="pl-8 pr-3 py-1.5 rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-surface-dark text-sm w-full md:w-64 focus:ring-primary/20 focus:border-primary"
+                                 placeholder="Rechercher par nom..." type="text" />
+                             <button></button>
+                         </form>
+
                      </div>
                  </div>
                  <?php if (isset($_GET['status']) && $_GET['status'] === 'updated'): ?>
                      <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
                          L'habitat a été mis à jour avec succès !
+                     </div>
+                 <?php endif; ?>
+                 <?php if (isset($_GET['status']) && $_GET['status'] === 'delete'): ?>
+                     <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+                         L'habitat a été supprimer avec succès !
+                     </div>
+                 <?php endif; ?>
+                 <?php if (isset($_GET['status']) && $_GET['status'] === 'added'): ?>
+                     <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+                         L'habitat a été ajouter avec succès !
                      </div>
                  <?php endif; ?>
                  <div id="card_habitas"
@@ -207,14 +226,12 @@
                                          class="px-6 py-3 font-semibold text-text-secondary-light dark:text-text-secondary-dark">
                                          Type</th>
                                      <th
-                                         class="px-6 py-3 font-semibold text-text-secondary-light dark:text-text-secondary-dark text-center">
+                                         class="px-6 py-3 text-start font-semibold text-text-secondary-light dark:text-text-secondary-dark text-center">
                                          Zone Zoo</th>
-                                     <th
-                                         class="px-6 py-3 font-semibold text-text-secondary-light dark:text-text-secondary-dark">
-                                         Description</th>
+
 
                                      <th
-                                         class="px-6 py-3 font-semibold text-text-secondary-light dark:text-text-secondary-dark text-right">
+                                         class="px-6 py-3 text-center font-semibold text-text-secondary-light dark:text-text-secondary-dark text-right">
                                          Actions</th>
                                  </tr>
                              </thead>
@@ -236,11 +253,7 @@
                                          <td class="px-6 py-3 text-start">
                                              <span class="font-bold text-sm text-primary"><?= htmlspecialchars($habitat['zone_zoo']) ?></span>
                                          </td>
-                                         <td class="px-6 py-3 max-w-xs overflow-hidden text-ellipsis">
-                                             <span class="text-text-light dark:text-text-dark text-xs">
-                                                 <?= htmlspecialchars($habitat['description_habitat']) ?>
-                                             </span>
-                                         </td>
+
 
                                          <td class="px-6 py-3 text-right">
                                              <div

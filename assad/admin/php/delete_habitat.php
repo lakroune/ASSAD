@@ -16,7 +16,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && isset($_POST['id_habitat'])) {
 
     if ($stmt->execute()) {
         if ($stmt->affected_rows > 0) {
-            header("location: ../admin_habitats.php?message=error_server");
+            header("location: ../admin_habitats.php?status=delete");
         } else {
             header("location: ../admin_habitats.php?message=error_server");
         }
