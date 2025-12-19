@@ -20,7 +20,6 @@
         while ($ligne =  $resultat->fetch_assoc())
             array_push($array_animaux, $ligne);
     } else {
-        // Redirection de sécurité
         header("Location: connexion.php?error=access_denied");
         exit();
     }
@@ -112,7 +111,7 @@
                              class="material-symbols-outlined text-2xl group-hover:text-primary transition-colors">group</span>
                          <span class="text-sm font-medium">Utilisateurs</span>
                      </a>
-                     
+
                  </nav>
              </div>
              <div class="border-t border-gray-200 dark:border-gray-800 pt-4 px-2">
@@ -170,7 +169,7 @@
                  <section class="grid grid-cols-1 md:grid-cols-3 gap-6">
                      <div class="bg-surface-light dark:bg-surface-dark p-5 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm">
                          <div class="flex items-center gap-3">
-                             <span class="material-symbols-outlined text-3xl text-primary">landscape</span>
+                             <span class="material-symbols-outlined text-3xl text-primary">forest</span>
                              <div>
                                  <p class="text-sm text-text-secondary-light dark:text-text-secondary-dark">Carnivore</p>
                                  <h3 class="text-xl font-bold text-text-light dark:text-text-dark"><?= count(array_filter($array_animaux, fn($a) => $a['alimentation_animal'] === 'Carnivore')) ?></h3>
@@ -181,16 +180,16 @@
                          <div class="flex items-center gap-3">
                              <span class="material-symbols-outlined text-3xl text-green-600">forest</span>
                              <div>
-                                 <p class="text-sm text-text-secondary-light dark:text-text-secondary-dark">Carnivore</p>
+                                 <p class="text-sm text-text-secondary-light dark:text-text-secondary-dark">Herbivore</p>
                                  <h3 class="text-xl font-bold text-text-light dark:text-text-dark"><?= count(array_filter($array_animaux, fn($a) => $a['alimentation_animal'] === 'herbivore')) ?></h3>
                              </div>
                          </div>
                      </div>
                      <div class="bg-surface-light dark:bg-surface-dark p-5 rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm">
                          <div class="flex items-center gap-3">
-                             <span class="material-symbols-outlined text-3xl text-blue-600">water_drop</span>
+                             <span class="material-symbols-outlined text-3xl text-blue-600">forest</span>
                              <div>
-                                 <p class="text-sm text-text-secondary-light dark:text-text-secondary-dark">Carnivore</p>
+                                 <p class="text-sm text-text-secondary-light dark:text-text-secondary-dark">Omnivore</p>
                                  <h3 class="text-xl font-bold text-text-light dark:text-text-dark"><?= count(array_filter($array_animaux, fn($a) => $a['alimentation_animal'] === 'omnivore')) ?></h3>
                              </div>
                          </div>
@@ -221,7 +220,7 @@
                                          Actions</th>
                                  </tr>
                              </thead>
-                             <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                             <tbody id="card-animaux" class="divide-y divide-gray-100 dark:divide-gray-800">
                                  <?php foreach ($array_animaux as $animal) : ?>
                                      <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors group">
                                          <td class="px-6 py-3">
@@ -263,11 +262,15 @@
                                                      <span class="material-symbols-outlined text-lg">visibility</span>
                                                  </button>
 
-                                                 <button
-                                                     class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-red-500"
-                                                     title="Supprimer">
-                                                     <span class="material-symbols-outlined text-lg">delete</span>
-                                                 </button>
+                                                 <form action="php/delete_animal.php" method="POST">
+                                                     <input type="hidden" value="<?= $animal['id_animal'] ?>" name="id_animal">
+                                                     <button
+                                                         type="button"
+                                                         class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-red-500"
+                                                         title="Supprimer">
+                                                         <span class="material-symbols-outlined text-lg">delete</span>
+                                                     </button>
+                                                 </form>
                                              </div>
                                          </td>
                                      </tr>
@@ -361,13 +364,23 @@
 
 
      <script>
+         document.getElementById('card-animaux').addEventListener('click', (e) => {
+             const ele_click = e.target;
+             if (ele_click.tagName === 'SPAN') {
+                 const form = ele_click.closest('form');
+                 if (form)
+                     if (confirm("veullez vous"))
+                         form.submit();
+
+             }
+         });
+
+
          function toggleModal() {
              const modal = document.getElementById('modalAnimal');
              modal.classList.toggle('hidden');
              modal.classList.toggle('flex');
          }
-
-         
      </script>
  </body>
 

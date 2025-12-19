@@ -2,10 +2,9 @@
 session_start();
 include "../../db_connect.php";
 
-header('Content-Type: application/json');
 
 if (!isset($_SESSION['role_utilisateur']) || $_SESSION['role_utilisateur'] !== "admin") {
-    echo json_encode(['success' => false, 'message' => 'Accès refusé']);
+    header("location: ../../connexion.php?message=error_server");
     exit();
 }
 
