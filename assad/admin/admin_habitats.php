@@ -113,7 +113,7 @@
                              class="material-symbols-outlined text-2xl group-hover:text-primary transition-colors">group</span>
                          <span class="text-sm font-medium">Utilisateurs</span>
                      </a>
-                    
+
                  </nav>
              </div>
              <div class="border-t border-gray-200 dark:border-gray-800 pt-4 px-2">
@@ -138,7 +138,7 @@
                          </p>
                      </div>
                      <div class="flex items-center gap-3">
-                         <button
+                         <button onclick=" toggleModal() ;"
                              class="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-600/30 transition-all text-sm font-bold">
                              <span class="material-symbols-outlined text-lg">add_location_alt</span>
                              Ajouter Nouvel Habitat
@@ -163,7 +163,7 @@
                      </div>
                  </div>
 
-                 <div
+                 <div id="card_habitas"
                      class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
                      <div class="overflow-x-auto">
                          <table class="w-full text-left text-sm whitespace-nowrap">
@@ -203,31 +203,43 @@
                                          <td class="px-6 py-3">
                                              <span class="text-text-light dark:text-text-dark font-medium"><?= htmlspecialchars($habitat['type_climat']) ?></span>
                                          </td>
-                                         <td class="px-6 py-3 text-center">
-                                             <span class="font-bold text-lg text-primary"><?= htmlspecialchars($habitat['zone_zoo']) ?></span>
+                                         <td class="px-6 py-3 text-start">
+                                             <span class="font-bold text-sm text-primary"><?= htmlspecialchars($habitat['zone_zoo']) ?></span>
                                          </td>
-                                         <td class="px-6 py-3">
-                                             <span class="text-text-light dark:text-text-dark font-medium"><?= htmlspecialchars($habitat['type_climat']) ?></span>
+                                         <td class="px-6 py-3 max-w-xs overflow-hidden text-ellipsis">
+                                             <span class="text-text-light dark:text-text-dark text-xs">
+                                                 <?= htmlspecialchars($habitat['description_habitat']) ?>
+                                             </span>
                                          </td>
 
                                          <td class="px-6 py-3 text-right">
                                              <div
                                                  class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+
+
                                                  <button
                                                      class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-blue-500"
                                                      title="Éditer les détails">
                                                      <span class="material-symbols-outlined text-lg">edit</span>
                                                  </button>
-                                                 <button
-                                                     class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-primary"
-                                                     title="Voir les animaux résidents">
-                                                     <span class="material-symbols-outlined text-lg">pets</span>
-                                                 </button>
-                                                 <button
-                                                     class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-red-500"
-                                                     title="Supprimer">
-                                                     <span class="material-symbols-outlined text-lg">delete</span>
-                                                 </button>
+                                                 <form class="" action="" method="POST">
+                                                     <input type="hidden" value="<?= $habitat['id_habitat'] ?>" name="id_habitat">
+                                                     <!-- button pour affiche  pop up les information sur  habitat -->
+                                                     <button
+                                                         class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-primary"
+                                                         title="Voir les animaux résidents">
+                                                         <span class="material-symbols-outlined text-lg">pets</span>
+                                                     </button>
+                                                 </form>
+                                                 <form class="delete" action="php/delete_habitat.php" method="POST">
+                                                     <input type="hidden" value="<?= $habitat['id_habitat'] ?>" name="id_habitat">
+                                                     <button
+                                                         type="button"
+                                                         class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-red-500"
+                                                         title="Supprimer">
+                                                         <span class="material-symbols-outlined text-lg">delete</span>
+                                                     </button>
+                                                 </form>
                                              </div>
                                          </td>
                                      </tr>
@@ -245,7 +257,98 @@
 
          </div>
      </main>
+     <div id="modalHabitat" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm">
+         <div class="bg-surface-light dark:bg-surface-dark w-full max-w-md p-6 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-800">
+             <div class="flex justify-between items-center mb-6">
+                 <h2 class="text-xl font-bold">Nouvel Habitat</h2>
+                 <button onclick="toggleModal()" class="text-gray-500 hover:text-red-500">
+                     <span class="material-symbols-outlined">close</span>
+                 </button>
+             </div>
 
+             <form action="php/add_habitat.php" method="POST" class="flex flex-col gap-4">
+                 <div>
+                     <label class="block text-sm font-medium mb-1">Nom de l'habitat</label>
+                     <input type="text" name="nom_habitat" required
+                         class="w-full rounded-lg border-gray-300 dark:bg-background-dark dark:border-gray-700 focus:ring-primary text-sm">
+                 </div>
+
+                 <div>
+                     <label class="block text-sm font-medium mb-1">Type de Climat</label>
+                     <select name="type_climat" required
+                         class="w-full rounded-lg border-gray-300 dark:bg-background-dark dark:border-gray-700 focus:ring-primary text-sm">
+                         <option value="" disabled selected>Choisir un climat...</option>
+                         <option value="Tropical">Tropical (Humide)</option>
+                         <option value="Aride">Aride (Désertique)</option>
+                         <option value="Tempéré">Tempéré (Forêt)</option>
+                         <option value="Polaire">Polaire (Froid)</option>
+                         <option value="Aquatique">Aquatique</option>
+                         <option value="Savane">Savane</option>
+                     </select>
+                 </div>
+
+                 <div>
+                     <label class="block text-sm font-medium mb-1">Zone du Zoo</label>
+                     <input type="text" name="zone_zoo" placeholder="Ex: Secteur Nord" required
+                         class="w-full rounded-lg border-gray-300 dark:bg-background-dark dark:border-gray-700 focus:ring-primary text-sm">
+                 </div>
+
+                 <div>
+                     <label class="block text-sm font-medium mb-1">Description</label>
+                     <textarea name="description_habitat" rows="3" maxlength="500" required
+                         class="w-full rounded-lg border-gray-300 dark:bg-background-dark dark:border-gray-700 focus:ring-primary text-sm"
+                         placeholder="Décrivez l'environnement..."></textarea>
+                 </div>
+
+                 <div class="mt-2 flex gap-3">
+                     <button type="button" onclick="toggleModal()"
+                         class="flex-1 py-2 text-sm font-bold border border-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors">
+                         Annuler
+                     </button>
+                     <button type="submit"
+                         class="flex-1 py-2 text-sm font-bold bg-primary text-white rounded-lg hover:bg-primary-dark shadow-lg shadow-primary/20 transition-all">
+                         Enregistrer
+                     </button>
+                 </div>
+             </form>
+         </div>
+     </div>
+     <!-- ajouter model pour affiche info de habitat -->
+     <script>
+         document.getElementById('card_habitas').addEventListener('click', (e) => {
+             const ele_click = e.target;
+             if (ele_click.tagName === 'SPAN') {
+                 const form = ele_click.closest('form.delete');
+                 if (form)
+                     if (confirm("veullez vous"))
+                         form.submit();
+
+             }
+         });
+         document.getElementById('card_habitas').addEventListener('click', (e) => {
+             const ele_click = e.target;
+             if (ele_click.tagName === 'SPAN') {
+                 const form = ele_click.closest('form.info');
+                 if (form)
+
+                     form.submit();
+
+             }
+         });
+
+
+         function toggleModal() {
+             const modal = document.getElementById('modalHabitat');
+             modal.classList.toggle('hidden');
+             modal.classList.toggle('flex');
+         }
+
+         function toggleModal_info() {
+             const modal = document.getElementById('modalInfoHabitat');
+             modal.classList.toggle('hidden');
+             modal.classList.toggle('flex');
+         }
+     </script>
  </body>
 
  </html>

@@ -25,7 +25,7 @@ CREATE TABLE animaux (
     pays_origine VARCHAR(100) NOT NULL,
     description_animal VARCHAR(500) NOT NULL,
     id_habitat INT NOT NULL,
-    FOREIGN KEY (id_habitat) REFERENCES habitats (id_habitat)
+    FOREIGN KEY (id_habitat) REFERENCES habitats (id_habitat) ON DELETE CASCADE
 );
 
 CREATE TABLE utilisateurs (
@@ -89,7 +89,7 @@ CREATE TABLE commentaires (
 );
 
 INSERT INTO habitats (nom_habitat, type_climat, description_habitat, zone_zoo) VALUES
-('Savane', 'Tropical sec', 'Vaste plaine avec herbes hautes et acacias.', 'Zone d');
+('Savane', 'Tropical sec', 'Vaste plaine avec herbes hautes et acacias.', 'Zone d'),
 ('Savane Africaine', 'Tropical sec', 'Vaste plaine avec herbes hautes et acacias.', 'Zone A'),
 ('Forêt Tropicale', 'Humide', 'Environnement dense avec forte humidité et végétation luxuriante.', 'Zone B'),
 ('Pôle Nord', 'Polaire', 'Zone glacée avec bassins d''eau froide.', 'Zone C');
