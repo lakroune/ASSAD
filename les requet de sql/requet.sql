@@ -89,6 +89,7 @@ CREATE TABLE commentaires (
 );
 
 INSERT INTO habitats (nom_habitat, type_climat, description_habitat, zone_zoo) VALUES
+('Savane', 'Tropical sec', 'Vaste plaine avec herbes hautes et acacias.', 'Zone d');
 ('Savane Africaine', 'Tropical sec', 'Vaste plaine avec herbes hautes et acacias.', 'Zone A'),
 ('Forêt Tropicale', 'Humide', 'Environnement dense avec forte humidité et végétation luxuriante.', 'Zone B'),
 ('Pôle Nord', 'Polaire', 'Zone glacée avec bassins d''eau froide.', 'Zone C');
@@ -130,3 +131,15 @@ SELECT * FROM visitesguidees where id_guide = 1;-- and dateheure_viste >= NOW() 
 SELECT  * FROM etapesvisite;
 
  select * from  utilisateurs u inner join  reservations r on  r.id_utilisateur = u.id_utilisateur inner join  visitesguidees v on v.id_visite=r.id_visite ;  
+
+SELECT * FROM utilisateurs where email ="admin@admin" ;
+ SELECT role , COUNT(*) FROM utilisateurs GROUP BY role HAVING role != "admin" ORDER BY role desc;
+ UPDATE utilisateurs SET role = "admin" WHERE id_utilisateur =16;
+
+
+
+ SELECT h.nom_habitat , COUNT(*) as count from  animaux a inner JOIN habitats h
+  on a.id_habitat= h.id_habitat   GROUP BY h.id_habitat  ORDER BY  h.id_habitat  asc ;
+
+SELECT  COUNT(*) as count FROM visitesguidees  ;
+SELECT  COUNT(*) as count FROM reservations  ;
