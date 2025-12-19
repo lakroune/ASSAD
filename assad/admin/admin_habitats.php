@@ -173,11 +173,11 @@
              </div>
          </header>
          <div class="flex-1 overflow-y-auto bg-background-light dark:bg-background-dark">
-             <div class="max-w-7xl mx-auto w-full px-6 py-8 flex flex-col gap-8">
+             <div class="max-w-7xl mx-auto w-full px-6 py -8 flex flex-col gap-8">
 
                  <div class="flex flex-col md:flex-row justify-between items-center gap-4 p-4 bg-surface-light dark:bg-surface-dark rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm">
                      <div class="flex flex-wrap gap-3">
-                         <button class="px-4 py-2 text-sm font-bold rounded-lg bg-primary text-white shadow-sm">Tous (<?= count($array_habitats) ?>)</button>
+                         <button class="px-4 py -2 text-sm font-bold rounded-lg bg-primary text-white shadow-sm">Tous (<?= count($array_habitats) ?>)</button>
                      </div>
                      <div class="relative w-full md:w-auto">
                          <span
@@ -187,10 +187,15 @@
                              placeholder="Rechercher par nom..." type="text" />
                      </div>
                  </div>
-
+                 <?php if (isset($_GET['status']) && $_GET['status'] === 'updated'): ?>
+                     <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded mb-4">
+                         L'habitat a été mis à jour avec succès !
+                     </div>
+                 <?php endif; ?>
                  <div id="card_habitas"
                      class="bg-surface-light dark:bg-surface-dark rounded-xl shadow-xl border border-gray-100 dark:border-gray-800 overflow-hidden">
                      <div class="overflow-x-auto">
+
                          <table class="w-full text-left text-sm whitespace-nowrap">
                              <thead
                                  class="bg-gray-50/50 dark:bg-gray-800/30 border-b border-gray-100 dark:border-gray-800">
@@ -284,6 +289,60 @@
 
          </div>
      </main>
+     <!-- ajoute model pour edit un habitat modalHabitat_edit -->
+     <?php if ($edit && $info_habitat): ?>
+         <div id="modalEditHabitat" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+             <div class="bg-surface-light dark:bg-surface-dark w-full max-w-md p-6 rounded-xl shadow-2xl border border-blue-500/30">
+                 <div class="flex justify-between items-center mb-6">
+                     <h2 class="text-xl font-bold text-blue-600">Modifier l'Habitat</h2>
+                     <button onclick="document.getElementById('modalEditHabitat').remove()" class="text-gray-500 hover:text-red-500">
+                         <span class="material-symbols-outlined">close</span>
+                     </button>
+                 </div>
+
+                 <form action="php/update_habitat.php" method="POST" class="flex flex-col gap-4">
+                     <input type="hidden" name="id_habitat" value="<?= $info_habitat['id_habitat'] ?>">
+
+                     <div>
+                         <label class="block text-sm font-medium mb-1">Nom de l'habitat</label>
+                         <input type="text" name="nom_habitat" value="<?= htmlspecialchars($info_habitat['nom_habitat']) ?>" required
+                             class="w-full rounded-lg border-gray-300 dark:bg-background-dark dark:border-gray-700 focus:ring-blue-500 text-sm">
+                     </div>
+
+                     <div>
+                         <label class="block text-sm font-medium mb-1">Type de Climat</label>
+                         <select name="type_climat" required class="w-full rounded-lg border-gray-300 dark:bg-background-dark dark:border-gray-700 focus:ring-blue-500 text-sm">
+                             <?php
+                                $climats = ["Tropical", "Aride", "Tempéré", "Polaire", "Aquatique", "Savane"];
+                                foreach ($climats as $c): ?>
+                                 <option value="<?= $c ?>" <?= ($info_habitat['type_climat'] == $c) ? 'selected' : '' ?>><?= $c ?></option>
+                             <?php endforeach; ?>
+                         </select>
+                     </div>
+
+                     <div>
+                         <label class="block text-sm font-medium mb-1">Zone du Zoo</label>
+                         <input type="text" name="zone_zoo" value="<?= htmlspecialchars($info_habitat['zone_zoo']) ?>" required
+                             class="w-full rounded-lg border-gray-300 dark:bg-background-dark dark:border-gray-700 focus:ring-blue-500 text-sm">
+                     </div>
+
+                     <div>
+                         <label class="block text-sm font-medium mb-1">Description</label>
+                         <textarea name="description_habitat" rows="4" required
+                             class="w-full rounded-lg border-gray-300 dark:bg-background-dark dark:border-gray-700 focus:ring-blue-500 text-sm"><?= htmlspecialchars($info_habitat['description_habitat']) ?></textarea>
+                     </div>
+
+                     <div class="mt-2 flex gap-3">
+                         <button type="button" onclick="document.getElementById('modalEditHabitat').remove()"
+                             class="flex-1 py-2 text-sm font-bold border border-gray-300 rounded-lg hover:bg-gray-50">Annuler</button>
+                         <button type="submit" class="flex-1 py-2 text-sm font-bold bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-lg shadow-blue-600/20">
+                             Mettre à jour
+                         </button>
+                     </div>
+                 </form>
+             </div>
+         </div>
+     <?php endif; ?>
      <div id="modalHabitat" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm">
          <div class="bg-surface-light dark:bg-surface-dark w-full max-w-md p-6 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-800">
              <div class="flex justify-between items-center mb-6">
@@ -401,7 +460,7 @@
 
          function closeInfoModal() {
              const modal = document.getElementById('modalInfoHabitat');
-             if (modal) modal.remove(); // On le supprime du DOM car il est généré par PHP
+             if (modal) modal.remove();
          }
      </script>
  </body>
