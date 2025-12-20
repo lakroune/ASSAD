@@ -1,6 +1,5 @@
  <?php
     session_start();
-    $_SESSION['role_utilisateur'] = "admin";
     include "../db_connect.php";
 
     if (
@@ -33,6 +32,17 @@
             $stmt->execute();
             $stmt->close();
         }
+        if ($_SERVER['REQUEST_METHOD'] === "POST" && isset($_POST['id_affiche'])) {
+            $id_utilisateur = $_POST['id_affiche'];
+            $sql = "select * from  utilisateurs  WHERE id_utilisateur = ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("i", $id_utilisateur);
+            $stmt->execute();
+            $resultat = $stmt->get_result();
+            $info_utilisateur = $resultat->fetch_assoc();
+            $stmt->close();
+        }
+
 
 
         $sql = " SELECT * FROM utilisateurs where role != 'admin' order by Approuver_utilisateur   ";
@@ -73,7 +83,7 @@
         }
     } else {
         // Redirection de sécurité
-        header("Location: connexion.php?error=access_denied");
+        header("Location: ../connexion.php?error=access_denied");
         exit();
     }
     ?>
@@ -262,12 +272,15 @@
                                          <td class="px-6 py-3 text-right">
                                              <div
                                                  class="flex items-center justify-end gap-1">
-                                                 
-                                                 <button
-                                                     class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-blue-500"
-                                                     title="Voir/Éditer le profil">
-                                                     <span class="material-symbols-outlined text-lg">visibility</span>
-                                                 </button>
+                                                 <!-- voici le button quand click sur il  ybano les info fi pop  -->
+                                                 <form action="" method="POST">
+                                                     <input type="hidden" name="id_affiche" value="<?= $user['id_utilisateur'] ?>">
+                                                     <button
+                                                         class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-blue-500"
+                                                         title="Voir/Éditer le profil">
+                                                         <span class="material-symbols-outlined text-lg">visibility</span>
+                                                     </button>
+                                                 </form>
                                                  <?php if ($user['statut_utilisateur'] === '0'): ?>
                                                      <form action="" method="POST">
                                                          <input type="hidden" name="id_suspendu" value="<?= $user['id_utilisateur'] ?>">
@@ -319,16 +332,117 @@
 
          </div>
      </main>
+
+     <?php if (isset($info_utilisateur)): ?>
+         <div id="userModal" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm">
+
+             <div class="bg-surface-light dark:bg-surface-dark w-full max-w-lg rounded-2xl shadow-2xl border border-gray-200 dark:border-gray-800 overflow-hidden transform transition-all">
+
+                 <div class="px-6 py-4 flex justify-between items-center bg-primary/10 border-b border-primary/20">
+                     <h3 class="text-xl font-bold flex items-center gap-2">
+                         <span class="material-symbols-outlined text-primary">account_circle</span>
+                         Détails de l'utilisateur
+                     </h3>
+                     <button onclick="closeModal()" class="hover:bg-gray-200 dark:hover:bg-gray-700 rounded-full p-1 transition-colors">
+                         <span class="material-symbols-outlined">close</span>
+                     </button>
+                 </div>
+
+                 <div class="p-6">
+                     <div class="flex items-center gap-4 mb-8">
+                         <div class="h-20 w-20 rounded-full bg-gradient-to-tr from-primary to-orange-300 flex items-center justify-center text-white text-3xl font-bold shadow-lg">
+                             <?= strtoupper(substr($info_utilisateur['nom_utilisateur'], 0, 1)) ?>
+                         </div>
+                         <div>
+                             <h4 class="text-2xl font-black text-text-light dark:text-text-dark leading-tight">
+                                 <?= htmlspecialchars($info_utilisateur['nom_utilisateur']) ?>
+                             </h4>
+                             <div class="flex gap-2 mt-1">
+                                 <?= get_role_badge($info_utilisateur['role']) ?>
+                                 <span class="text-xs bg-gray-100 dark:bg-gray-700 px-2 py-0.5 rounded-full flex items-center gap-1">
+                                     ID: #<?= $info_utilisateur['id_utilisateur'] ?>
+                                 </span>
+                             </div>
+                         </div>
+                     </div>
+
+                     <div class="grid grid-cols-2 gap-y-6 gap-x-4">
+
+                         <div class="col-span-2 sm:col-span-1">
+                             <p class="text-xs text-text-secondary-light dark:text-text-secondary-dark font-bold uppercase tracking-wider">Email</p>
+                             <p class="flex items-center gap-2 font-medium truncate">
+                                 <span class="material-symbols-outlined text-sm">mail</span>
+                                 <?= htmlspecialchars($info_utilisateur['email']) ?>
+                             </p>
+                         </div>
+
+                         <div class="col-span-2 sm:col-span-1">
+                             <p class="text-xs text-text-secondary-light dark:text-text-secondary-dark font-bold uppercase tracking-wider">Localisation</p>
+                             <p class="flex items-center gap-2 font-medium">
+                                 <span class="material-symbols-outlined text-sm">location_on</span>
+                                 <?= htmlspecialchars($info_utilisateur['pays_utilisateur'] ?? 'Non défini') ?>
+                             </p>
+                         </div>
+
+                         <div>
+                             <p class="text-xs text-text-secondary-light dark:text-text-secondary-dark font-bold uppercase tracking-wider">État du compte</p>
+                             <div class="mt-1">
+                                 <?= get_status_indicator_color($info_utilisateur['statut_utilisateur']) ?>
+                                 <span class="font-bold"><?= $info_utilisateur['statut_utilisateur'] == 1 ? 'Actif' : 'Suspendu' ?></span>
+                             </div>
+                         </div>
+
+                         <div>
+                             <p class="text-xs text-text-secondary-light dark:text-text-secondary-dark font-bold uppercase tracking-wider">Approbation</p>
+                             <p class="mt-1 font-bold <?= $info_utilisateur['Approuver_utilisateur'] == 1 ? 'text-green-500' : 'text-orange-500' ?>">
+                                 <?= $info_utilisateur['Approuver_utilisateur'] == 1 ? '✓ Approuvé' : '⌛ En attente' ?>
+                             </p>
+                         </div>
+                     </div>
+                 </div>
+
+                 <div class="px-6 py-4 bg-gray-50 dark:bg-gray-800/40 flex justify-end gap-3">
+                     <button onclick="closeModal()" class="px-5 py-2 text-sm font-bold text-gray-500 hover:text-gray-700">Fermer</button>
+                     <button class="px-5 py-2 text-sm font-bold bg-primary text-white rounded-lg shadow-md hover:bg-primary-dark transition-all">
+                         Modifier le profil
+                     </button>
+                 </div>
+             </div>
+         </div>
+
+         <script>
+             function closeModal() {
+                 document.getElementById('userModal').classList.add('hidden');
+             }
+         </script>
+     <?php endif; ?>
+
      <script>
          document.getElementById('card-user').addEventListener('click', (e) => {
              const ele_click = e.target;
              if (ele_click.tagName === 'SPAN') {
                  const form = ele_click.closest('form.Approuver_utilisateur');
                  if (form)
-                     if (confirm("veullez vous"))
+                     if (confirm("Voulez-vous vraiment approuver le guide "))
                          form.submit();
              }
          });
+
+         function closeModal() {
+             const modal = document.getElementById('userModal');
+             if (modal) {
+                 modal.classList.add('hidden');
+
+             }
+         }
+
+
+         window.onclick = function(event) {
+             const modal = document.getElementById('userModal');
+             if (event.target == modal) {
+                 closeModal();
+             }
+         }
      </script>
  </body>
 

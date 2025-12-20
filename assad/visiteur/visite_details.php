@@ -3,14 +3,15 @@
     $image = "https://lh3.googleusercontent.com/aida-public/AB6AXuBB3mzttMFekKaHiUMQgz9CbcCvR-LHMfkNamiYLEoaa6mr4VX3RGazcvrLyN6USTeeR3THkb5RzRgunm2nxYGRlj0JP37XKsb0oTpMuUfgiqYzKIQpDFu5Cwamtq0rGjsH93RIdsA6guKSg4KakhrlAV6mKU_SZGX00TM6y3-uGVugQHONmrBvFsVLmZ73htnyBEHRcaZXZ-cwzOoPb7aiKe-dIsmCV4By1n5q6PJKo8CSmh3GTGb2hDjnxSb8_vhCsJz-sArwzoL6";
     
     session_start();
-    $_SESSION['role_utilisateur'] = "visiteur";
+ 
     include "../db_connect.php";
-
-    if (
-        isset($_SESSION['role_utilisateur'], $_SESSION['logged_in'], $_SESSION['id_utilisateur'], $_SESSION['nom_utilisateur']) &&
+  if (
+        isset($_SESSION['role_utilisateur'], $_SESSION['logged_in'], $_SESSION['id_utilisateur']) &&
         $_SESSION['role_utilisateur'] === "visiteur" &&
         $_SESSION['logged_in'] === TRUE
     ) {
+
+
         $id_utilisateur = htmlspecialchars($_SESSION['id_utilisateur']);
         $nom_utilisateur = htmlspecialchars($_SESSION['nom_utilisateur']);
         $role_utilisateur = htmlspecialchars($_SESSION['role_utilisateur']);

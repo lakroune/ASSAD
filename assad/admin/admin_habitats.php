@@ -1,6 +1,5 @@
  <?php
     session_start();
-    $_SESSION['role_utilisateur'] = "admin";
     include "../db_connect.php";
 
     if (
@@ -41,6 +40,7 @@
                 $edit = true;
                 $id_h = $_POST['id_habitat_edit'];
             }
+
             $sql_info = "SELECT * FROM habitats WHERE id_habitat = ?";
             $stmt = $conn->prepare($sql_info);
             $stmt->bind_param("i", $id_h);
@@ -50,7 +50,7 @@
         }
     } else {
 
-        header("Location: connexion.php?error=access_denied");
+        header("Location: ../connexion.php?error=access_denied");
         exit();
     }
     ?>
@@ -302,7 +302,8 @@
 
          </div>
      </main>
-     <!-- ajoute model pour edit un habitat modalHabitat_edit -->
+
+     <!-- info habiata -->
      <?php if ($edit && $info_habitat): ?>
          <div id="modalEditHabitat" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
              <div class="bg-surface-light dark:bg-surface-dark w-full max-w-md p-6 rounded-xl shadow-2xl border border-blue-500/30">
@@ -355,7 +356,8 @@
                  </form>
              </div>
          </div>
-     <?php endif; ?>
+     
+         <?php endif; ?>
      <div id="modalHabitat" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/50 backdrop-blur-sm">
          <div class="bg-surface-light dark:bg-surface-dark w-full max-w-md p-6 rounded-xl shadow-2xl border border-gray-200 dark:border-gray-800">
              <div class="flex justify-between items-center mb-6">

@@ -2,15 +2,10 @@
 include "../db_connect.php";
 session_start();
 
-$_SESSION['role_utilisateur'] = "visiteur";
-$_SESSION['logged_in'] = TRUE;
-$_SESSION['id_utilisateur'] = 1;
-$_SESSION['nom_utilisateur'] = "guide";
-
 
 if (
     isset($_SESSION['role_utilisateur'], $_SESSION['logged_in']) &&
-    $_SESSION['role_utilisateur'] === "visiteur" &&
+    $_SESSION['role_utilisateur'] === "guide" &&
     $_SESSION['logged_in'] === TRUE
 ) {
     $id_utilisateur = htmlspecialchars($_SESSION['id_utilisateur']);
@@ -20,7 +15,7 @@ if (
 
 
     $date_now = date('d-m-Y H:i:s');
-    $sql = " SELECT * FROM visitesguidees where id_guide = $id_utilisateur and dateheure_viste >= ' " . $date_now . "' order by  dateheure_viste desc limit 1";
+    $sql = " SELECT * FROM visitesguidees where id_guide = $id_utilisateur and dateheure_viste <= ' " . $date_now . "' order by  dateheure_viste desc limit 1";
 
     $resultat = $conn->query($sql);
     $visite = array();
@@ -53,7 +48,7 @@ if (
         $star_total = $snbtar / (5 * $count_res);
 } else {
     // Redirection de sécurité
-    header("Location: connexion.php?error=access_denied");
+    header("Location: ../connexion.php?error=access_denied");
     exit();
 }
 ?>
@@ -148,18 +143,16 @@ if (
                         <span>Réservations</span>
                     </a>
 
-                    <a class="flex items-center gap-3 px-4 py-3 rounded-xl text-text-main-light dark:text-text-sec-dark hover:bg-border-light dark:hover:bg-surface-dark transition-colors font-medium" href="parametres.php">
-                        <span class="material-symbols-outlined text-text-sec-light dark:text-text-sec-dark">settings</span>
-                        <span>Paramètres</span>
-                    </a>
+
 
                 </nav>
             </div>
-            <div class="flex items-center gap-3 px-4 py-3 rounded-xl bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark shadow-sm">
-                <div class="bg-center bg-cover rounded-full h-10 w-10 border-2 border-primary" data-alt="Portrait du guide" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB6SweDCChTHrnzUi3ijD-HqKt7FximPeaVPRuHptoZB3gCiNIREev191XH6lCU2g9dWO-0nb19loXauXqO29KxIYeVB8L_qXV7j_z9ew9PCkxmtTGzyhArcCoyjioHHD9oWPKFoA4SKfrqRSRlWptyCfastPtNkgSlFizXCwA60Izfk-CrC13bruBTAOjH610XOUvFB1RnfkoM-IeFW7fkvzAujenUwRWp02gjgWiOhb4zpbuGErPegntLM0188b1Dkbt6DnzndgR5");'></div>
-                <div class="flex flex-col overflow-hidden">
-                    <p class="text-sm font-bold truncate"><?= $nom_utilisateur ?></p>
-                    <p class="text-text-sec-light dark:text-text-sec-dark text-xs truncate">Guide <?= $role_utilisateur ?></p>
+            <div class="border-t border-gray-200 dark:border-gray-800 pt-4 px-2">
+                <div class="flex items-center gap-3">
+
+                    <div class="flex flex-col">
+                        <a href="../php/seconnecter.php" class="text-xs text-text-secondary-light dark:text-text-secondary-dark">se deconnecter</a>
+                    </div>
                 </div>
             </div>
         </aside>
@@ -181,9 +174,10 @@ if (
                     <div class="bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark shadow-md p-5 flex flex-col gap-2">
                         <span class="material-symbols-outlined text-primary text-3xl">event_upcoming</span>
                         <p class="text-sm text-text-sec-light dark:text-text-sec-dark font-medium">Prochaine Visite</p>
-                        <p class="text-xl font-extrabold tracking-tight text-primary"><?= date('d-m-Y', strtotime($visite['dateheure_viste'])) ?></p>
-                        <p class="text-sm  font-extrabold tracking-tight text-primary"><?= "à  " . date('H:i', strtotime($visite['dateheure_viste'])) ?></p>
-                        <p class="text-sm font-semibold"><?= $visite["titre_visite"] ?></p>
+                        <p class="text-xl font-extrabold tracking-tight text-primary"><?php if ($visite) echo date('d-m-Y', strtotime($visite['dateheure_viste'])) ?></p>
+                        <p class="text-sm  font-extrabold tracking-tight text-primary"><?php if ($visite) echo "à  " . date('H:i', strtotime($visite['dateheure_viste'])) ?></p>
+                        <p class="text-sm font-semibold"><?php if ($visite) echo  $visite["titre_visite"];
+                                                            else echo "aucun visite pour ce instant"  ?></p>
                     </div>
 
                     <div class="bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark shadow-md p-5 flex flex-col gap-2">
@@ -193,12 +187,12 @@ if (
                         <p class="text-sm font-semibold">total historique</p>
                     </div>
 
-                    <div class="bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark shadow-md p-5 flex flex-col gap-2">
+                    <!-- <div class="bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark shadow-md p-5 flex flex-col gap-2">
                         <span class="material-symbols-outlined text-blue-600 text-3xl">groups</span>
                         <p class="text-sm text-text-sec-light dark:text-text-sec-dark font-medium">Réservations à Venir</p>
                         <p class="text-xl font-extrabold tracking-tight"><?= "cccc" ?></p>
                         <p class="text-sm font-semibold">participants confirmés</p>
-                    </div>
+                    </div> -->
 
                     <div class="bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark shadow-md p-5 flex flex-col gap-2">
                         <span class="material-symbols-outlined text-yellow-500 text-3xl">star</span>

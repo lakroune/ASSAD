@@ -1,6 +1,5 @@
  <?php
     session_start();
-    $_SESSION['role_utilisateur'] = "admin";
     include "../db_connect.php";
 
     if (
@@ -67,7 +66,7 @@
         }
     } else {
 
-        header("Location: connexion.php?error=access_denied");
+        header("Location: ../connexion.php?error=access_denied");
         exit();
     }
     ?>
@@ -165,7 +164,7 @@
                  <div class="flex items-center gap-3">
 
                      <div class="flex flex-col">
-                         <a href="../php/sedeconnecter.php" class="text-xs text-text-secondary-light dark:text-text-secondary-dark">se deconnecter</a>
+                         <a href="../php/seconnecter.php" class="text-xs text-text-secondary-light dark:text-text-secondary-dark">se deconnecter</a>
                      </div>
                  </div>
              </div>

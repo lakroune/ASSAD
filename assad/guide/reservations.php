@@ -2,12 +2,6 @@
 include "../db_connect.php";
 session_start();
 
-$_SESSION['role_utilisateur'] = "guide";
-$_SESSION['logged_in'] = TRUE;
-$_SESSION['id_utilisateur'] = 1;
-$_SESSION['nom_utilisateur'] = "guide";
-
-
 
 if (
     isset($_SESSION['role_utilisateur'], $_SESSION['logged_in']) &&
@@ -16,18 +10,19 @@ if (
 ) {
     $id_utilisateur = htmlspecialchars($_SESSION['id_utilisateur']);
     $nom_utilisateur = htmlspecialchars($_SESSION['nom_utilisateur']);
-    $role_utilisateur = htmlspecialchars($_SESSION['role_utilisateur']);
+    $role_utilisateur = htmlspecialchars($_SESSION['id_utilisateur']);
 
 
 
-    $sql = " select * from  utilisateurs u inner join  reservations r on  r.id_utilisateur = u.id_utilisateur inner join  visitesguidees v on v.id_visite=r.id_visite ";
+
+    $sql = " select * from  utilisateurs u inner join  reservations r on  r.id_utilisateur = u.id_utilisateur inner join  visitesguidees v on v.id_visite=r.id_visite and id_guide= $id_utilisateur";
     $resultat = $conn->query($sql);
     $array_participants = array();
     while ($ligne =  $resultat->fetch_assoc())
         array_push($array_participants, $ligne);
 } else {
 
-    header("Location: connexion.php?error=access_denied");
+    header("Location: ../connexion.php?error=access_denied");
     exit();
 }
 
@@ -120,17 +115,15 @@ if (
                         <span class="material-symbols-outlined">groups</span>
                         <span>Réservations</span>
                     </a>
-                    <a class="flex items-center gap-3 px-4 py-3 rounded-xl text-text-main-light dark:text-text-sec-dark hover:bg-border-light dark:hover:bg-surface-dark transition-colors font-medium" href="parametres.php">
-                        <span class="material-symbols-outlined text-text-sec-light dark:text-text-sec-dark">settings</span>
-                        <span>Paramètres</span>
-                    </a>
+
                 </nav>
             </div>
-            <div class="flex items-center gap-3 px-4 py-3 rounded-xl bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark shadow-sm">
-                <div class="bg-center bg-cover rounded-full h-10 w-10 border-2 border-primary" data-alt="Portrait du guide" style='background-image: url("https://lh3.googleusercontent.com/aida-public/AB6AXuB6SweDCChTHrnzUi3ijD-HqKt7FximPeaVPRuHptoZB3gCiNIREev191XH6lCU2g9dWO-0nb19loXauXqO29KxIYeVB8L_qXV7j_z9ew9PCkxmtTGzyhArcCoyjioHHD9oWPKFoA4SKfrqRSRlWptyCfastPtNkgSlFizXCwA60Izfk-CrC13bruBTAOjH610XOUvFB1RnfkoM-IeFW7fkvzAujenUwRWp02gjgWiOhb4zpbuGErPegntLM0188b1Dkbt6DnzndgR5");'></div>
-                <div class="flex flex-col overflow-hidden">
-                    <p class="text-sm font-bold truncate"><?= $nom_utilisateur ?></p>
-                    <p class="text-text-sec-light dark:text-text-sec-dark text-xs truncate">Guide <?= $role_utilisateur ?></p>
+            <div class="border-t border-gray-200 dark:border-gray-800 pt-4 px-2">
+                <div class="flex items-center gap-3">
+
+                    <div class="flex flex-col">
+                        <a href="../php/seconnecter.php" class="text-xs text-text-secondary-light dark:text-text-secondary-dark">se deconnecter</a>
+                    </div>
                 </div>
             </div>
         </aside>
@@ -180,7 +173,7 @@ if (
                             <?php if (empty($array_participants)): ?>
                                 <tr>
                                     <td colspan="6" class="px-6 py-4 whitespace-nowrap text-center text-sm text-text-sec-light dark:text-text-sec-dark">
-                                        Aucune réservation dans cette catégorie (<?= "jjj" ?>).
+                                        Aucune réservation  .
                                     </td>
                                 </tr>
                             <?php else: ?>

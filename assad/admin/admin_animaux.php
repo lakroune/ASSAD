@@ -1,6 +1,5 @@
  <?php
     session_start();
-    $_SESSION['role_utilisateur'] = "admin";
     include "../db_connect.php";
 
     if (
@@ -13,14 +12,44 @@
         $role_utilisateur = htmlspecialchars($_SESSION['role_utilisateur']);
 
 
-        $sql = " select * from  animaux a inner join  habitats h on a.id_habitat =h.id_habitat  ";
-        $resultat = $conn->query($sql);
 
+
+        $sql = "  select * from  animaux a inner join  habitats h on a.id_habitat =h.id_habitat where nom_animal like  ?";
+        $searchInput = "%";
+        if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['searchInput']))
+            $searchInput =  htmlspecialchars($_POST["searchInput"]) . "%";
+        $stmt = $conn->prepare($sql);
+        $stmt->bind_param("s", $searchInput);
+        $stmt->execute();
+        $resultat = $stmt->get_result();
         $array_animaux = array();
         while ($ligne =  $resultat->fetch_assoc())
             array_push($array_animaux, $ligne);
+
+
+
+        $info_animal = null;
+        $info = false;
+        $edit = false;
+        if ($_SERVER["REQUEST_METHOD"] == "POST" && (isset($_POST['id_animal_info']) or isset($_POST['id_animal_edit']))) {
+            $id_animal = null;
+            if (!empty($_POST['id_animal_info'])) {
+                $info = true;
+                $id_animal = $_POST['id_animal_info'];
+            }
+            if (!empty($_POST['id_animal_edit'])) {
+                $edit = true;
+                $id_animal = $_POST['id_animal_edit'];
+            }
+            $sql_info = " select * from  animaux a inner join  habitats h on a.id_habitat =h.id_habitat  WHERE id_animal = ?";
+            $stmt = $conn->prepare($sql_info);
+            $stmt->bind_param("i", $id_animal);
+            $stmt->execute();
+            $res = $stmt->get_result();
+            $info_animal = $res->fetch_assoc();
+        }
     } else {
-        header("Location: connexion.php?error=access_denied");
+        header("Location: ../connexion.php?error=access_denied");
         exit();
     }
     ?>
@@ -241,19 +270,25 @@
                                          <td class="px-6 py-3 text-right">
                                              <div
                                                  class="flex items-center justify-end gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-                                                 <button
-                                                     class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-blue-500"
-                                                     title="Éditer les détails">
-                                                     <span class="material-symbols-outlined text-lg">edit</span>
-                                                 </button>
+                                                 <form action="" method="POST" class="edit">
+                                                     <input type="hidden" value="<?= $animal['id_animal'] ?>" name="id_animal_edit">
+                                                     <button
+                                                         class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-blue-500"
+                                                         title="Éditer les détails">
+                                                         <span class="material-symbols-outlined text-lg">edit</span>
+                                                     </button>
+                                                 </form>
 
-                                                 <button
-                                                     class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-green-500"
-                                                     title="Rendre visible">
-                                                     <span class="material-symbols-outlined text-lg">visibility</span>
-                                                 </button>
+                                                 <form action="" method="POST" class="info">
+                                                     <input type="hidden" value="<?= $animal['id_animal'] ?>" name="id_animal_info">
+                                                     <button
+                                                         class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-green-500"
+                                                         title="Rendre visible">
+                                                         <span class="material-symbols-outlined text-lg">visibility</span>
+                                                     </button>
+                                                 </form>
 
-                                                 <form action="php/delete_animal.php" method="POST">
+                                                 <form action="php/delete_animal.php" method="POST" class="delete">
                                                      <input type="hidden" value="<?= $animal['id_animal'] ?>" name="id_animal">
                                                      <button
                                                          type="button"
@@ -288,6 +323,109 @@
 
          </div>
      </main>
+
+     <?php if ($info): ?>
+         <div id="modalInfoHabitat" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+             <div class="bg-surface-light dark:bg-surface-dark w-full max-w-lg p-8 rounded-2xl shadow-2xl border border-primary/20">
+                 <div class="flex justify-between items-start mb-6">
+
+                     <div class="h-20 w-20 rounded-full bg-gradient-to-tr from-primary to-orange-300 flex items-center justify-center text-white text-3xl font-bold shadow-lg " style="background-image: url(' <?= $info_animal['image_url'] ?>'); background_size:cover; ">
+
+                     </div>
+                     <div>
+                         <p class="text-primary font-bold text-xs uppercase tracking-widest">Détails de l'animal</p>
+                         <h2 class="text-3xl font-black"><?= htmlspecialchars($info_animal['nom_animal']) ?></h2>
+                     </div>
+                     <button onclick="closeInfoModal()" class="bg-gray-100 dark:bg-gray-800 p-2 rounded-full hover:text-red-500 transition-colors">
+                         <span class="material-symbols-outlined">close</span>
+                     </button>
+                 </div>
+                 <div class="grid grid-cols-2 gap-4 mb-6">
+                     <div class="p-4 bg-gray-50 dark:bg-background-dark rounded-xl">
+                         <p class="text-xs text-text-secondary-light">espece</p>
+                         <p class="font-bold"><?= htmlspecialchars($info_animal['espece']) ?></p>
+                     </div>
+                     <div class="p-4 bg-gray-50 dark:bg-background-dark rounded-xl">
+                         <p class="text-xs text-text-secondary-light">Type d'alimentation</p>
+                         <p class="font-bold"><?= htmlspecialchars($info_animal['alimentation_animal']) ?></p>
+                     </div>
+                 </div>
+                 <div class="grid grid-cols-2 gap-4 mb-6">
+                     <div class="p-4 bg-gray-50 dark:bg-background-dark rounded-xl">
+                         <p class="text-xs text-text-secondary-light">Pays Origine</p>
+                         <p class="font-bold"><?= htmlspecialchars($info_animal['pays_origine']) ?></p>
+                     </div>
+                     <div class="p-4 bg-gray-50 dark:bg-background-dark rounded-xl">
+                         <p class="text-xs text-text-secondary-light">Type d'alimentation</p>
+                         <p class="font-bold"><?= htmlspecialchars($info_animal['nom_habitat']) ?></p>
+                     </div>
+                 </div>
+                 <div class="mb-8">
+                     <p class="text-xs text-text-secondary-light mb-2">Description complète</p>
+                     <p class="text-sm leading-relaxed italic text-text-secondary-dark">
+                         "<?= nl2br(htmlspecialchars($info_animal['description_animal'])) ?>"
+                     </p>
+                 </div>
+                 <button onclick="closeInfoModal()" class="w-full py-3 bg-primary text-white font-bold rounded-xl">Fermer</button>
+             </div>
+         </div>
+     <?php endif; ?>
+
+     <?php if ($edit && $info_animal): ?>
+         <div id="modalEditHabitat" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+             <div class="bg-surface-light dark:bg-surface-dark w-full max-w-md p-6 rounded-xl shadow-2xl border border-blue-500/30">
+                 <div class="flex justify-between items-center mb-6">
+                     <h2 class="text-xl font-bold text-blue-600">Modifier l'Habitat</h2>
+                     <button onclick="document.getElementById('modalEditHabitat').remove()" class="text-gray-500 hover:text-red-500">
+                         <span class="material-symbols-outlined">close</span>
+                     </button>
+                 </div>
+
+                 <form action="php/update_habitat.php" method="POST" class="flex flex-col gap-4">
+                     <input type="hidden" name="id_habitat" value="<?= $info_animal['id_habitat'] ?>">
+
+                     <div>
+                         <label class="block text-sm font-medium mb-1">Nom de l'habitat</label>
+                         <input type="text" name="nom_habitat" value="<?= htmlspecialchars($info_animal['nom_habitat']) ?>" required
+                             class="w-full rounded-lg border-gray-300 dark:bg-background-dark dark:border-gray-700 focus:ring-blue-500 text-sm">
+                     </div>
+
+                     <div>
+                         <label class="block text-sm font-medium mb-1">Type de Climat</label>
+                         <select name="type_climat" required class="w-full rounded-lg border-gray-300 dark:bg-background-dark dark:border-gray-700 focus:ring-blue-500 text-sm">
+                             <?php
+                                $climats = ["Tropical", "Aride", "Tempéré", "Polaire", "Aquatique", "Savane"];
+                                foreach ($climats as $c): ?>
+                                 <option value="<?= $c ?>" <?= ($info_animal['type_climat'] == $c) ? 'selected' : '' ?>><?= $c ?></option>
+                             <?php endforeach; ?>
+                         </select>
+                     </div>
+
+                     <div>
+                         <label class="block text-sm font-medium mb-1">Zone du Zoo</label>
+                         <input type="text" name="zone_zoo" value="<?= htmlspecialchars($info_animal['zone_zoo']) ?>" required
+                             class="w-full rounded-lg border-gray-300 dark:bg-background-dark dark:border-gray-700 focus:ring-blue-500 text-sm">
+                     </div>
+
+                     <div>
+                         <label class="block text-sm font-medium mb-1">Description</label>
+                         <textarea name="description_habitat" rows="4" required
+                             class="w-full rounded-lg border-gray-300 dark:bg-background-dark dark:border-gray-700 focus:ring-blue-500 text-sm"><?= htmlspecialchars($info_animal['description_habitat']) ?></textarea>
+                     </div>
+
+                     <div class="mt-2 flex gap-3">
+                         <button type="button" onclick="document.getElementById('modalEditHabitat').remove()"
+                             class="flex-1 py-2 text-sm font-bold border border-gray-300 rounded-lg hover:bg-gray-50">Annuler</button>
+                         <button type="submit" class="flex-1 py-2 text-sm font-bold bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-lg shadow-blue-600/20">
+                             Mettre à jour
+                         </button>
+                     </div>
+                 </form>
+             </div>
+         </div>
+     <?php endif; ?>
+     <!-- model add animal -->
+
      <div id="modalAnimal" class="fixed inset-0 z-50 hidden overflow-y-auto bg-black/50 backdrop-blur-sm flex  items-center justify-center p-4">
          <div class="bg-surface-light dark:bg-surface-dark w-full max-w-lg rounded-xl shadow-2xl border border-gray-200 dark:border-gray-700">
              <div class="p-6 border-b border-gray-100 dark:border-gray-800 flex justify-between items-center">
@@ -358,13 +496,33 @@
          document.getElementById('card-animaux').addEventListener('click', (e) => {
              const ele_click = e.target;
              if (ele_click.tagName === 'SPAN') {
-                 const form = ele_click.closest('form');
+                 const form = ele_click.closest('form.delete');
                  if (form)
-                     if (confirm("veullez vous"))
+                     if (confirm("Voulez-vous vraiment supprimer cet animal ?"))
                          form.submit();
 
              }
          });
+
+         document.getElementById('card-animaux').addEventListener('click', (e) => {
+             const ele_click = e.target;
+             if (ele_click.tagName === 'SPAN') {
+                 const form = ele_click.closest('form.edit');
+                 if (form)
+                     form.submit();
+
+             }
+         });
+         document.getElementById('card-animaux').addEventListener('click', (e) => {
+             const ele_click = e.target;
+             if (ele_click.tagName === 'SPAN') {
+                 const form = ele_click.closest('form.info');
+                 if (form)
+                     form.submit();
+
+             }
+         });
+
 
 
          function toggleModal() {

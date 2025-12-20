@@ -9,6 +9,7 @@ if (
 
     $email = $_POST['email'];
     $password = $_POST['password'];
+ 
 
     $sql = "SELECT  * FROM utilisateurs  WHERE email = ?";
 
@@ -30,13 +31,14 @@ if (
         $user = $result->fetch_assoc();
         $hashedPassword = $user['motpasse_hash'];
 
-        if (password_verify($password, $hashedPassword)) {
+        if($user["Approuver_utilisateur"]){
+            if (password_verify($password, $hashedPassword)) {
 
             session_start();
 
             $_SESSION['id_utilisateur'] = $user['id_utilisateur'];
             $_SESSION['nom_utilisateur'] = $user['nom_utilisateur'];
-            $_SESSION['roleutilisateur'] = $user['role'];
+            $_SESSION['role_utilisateur'] = $user['role'];
             $_SESSION['logged_in'] = TRUE;
             if ($user['role'] === "admin")
                 header("Location: ../admin");
@@ -46,6 +48,9 @@ if (
                 header("Location: ../visiteur");
         } else {
             header("Location: ../connexion.php?error=invalid2");
+        }
+        }else{
+ header("Location: ../connexion.php?error=invalid3");
         }
     } else {
         header("Location: ../connexion.php?error=invalid1");

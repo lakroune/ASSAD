@@ -338,10 +338,12 @@ SELECT COUNT(*) as count FROM reservations;
 
 SELECT * FROM habitats;
 
-SELECT  * FROM utilisateurs WHERE role != "admin";
+SELECT  * FROM utilisateurs ;
 
 UPDATE utilisateurs
 SET
     statut_utilisateur = 0
 WHERE
     id_utilisateur = 9;
+
+ UPDATE utilisateurs set role= "admin" WHERE email ="jaka@gmail.com"

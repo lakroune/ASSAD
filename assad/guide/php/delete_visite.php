@@ -8,10 +8,17 @@ if (!isset($_SESSION['id_utilisateur'])) {
 }
 
 $id_guide = $_SESSION['id_utilisateur'];
-
-if (isset($_GET['id']) && !empty($_GET['id'])) {
+$sql_status = "select statut_utilisateur FROM utilisateurs WHERE id_utilisateur = ?";
+$stmtStatus = $conn->prepare($sql_status);
+$stmtStatus->bind_param("i", $id_guide);
+$stmtStatus->execute();
+$resultat = $stmtStatus->get_result();
+$statut_utilisateur = 0;
+if ($resultat->num_rows > 0)
+    $statut_utilisateur = $resultat->fetch_assoc()["statut_utilisateur"];
+if (isset($_GET['id']) && !empty($_GET['id']) && $statut_utilisateur) {
     $id_visite = intval($_GET['id']);
- 
+
     try {
         $sqlEtapes = "DELETE FROM etapesvisite WHERE id_visite = ?";
         $stmtEtapes = $conn->prepare($sqlEtapes);
@@ -49,5 +56,5 @@ if (isset($_GET['id']) && !empty($_GET['id'])) {
     }
 } else {
 
-    header("Location: ../mes_visites.php");
+    header("Location: ../mes_visites.php?status=Suspendu");
 }

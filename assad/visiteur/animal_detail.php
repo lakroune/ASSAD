@@ -8,10 +8,14 @@ if ($animal_id) {
     include "../db_connect.php";
 
     if (
-        isset($_SESSION['role_utilisateur'], $_SESSION['logged_in'], $_SESSION['id_utilisateur'], $_SESSION['nom_utilisateur']) &&
+        isset($_SESSION['role_utilisateur'], $_SESSION['logged_in'], $_SESSION['id_utilisateur']) &&
         $_SESSION['role_utilisateur'] === "visiteur" &&
         $_SESSION['logged_in'] === TRUE
     ) {
+
+
+
+
         $id_utilisateur = htmlspecialchars($_SESSION['id_utilisateur']);
 
 

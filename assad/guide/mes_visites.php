@@ -3,27 +3,30 @@ include "../db_connect.php";
 session_start();
 
 
-if (!isset($_SESSION['id_utilisateur'])) {
-    $_SESSION['role_utilisateur'] = "guide";
-    $_SESSION['logged_in'] = TRUE;
-    $_SESSION['id_utilisateur'] = 1;
-    $_SESSION['nom_utilisateur'] = "Ahmed El Guide";
-}
-
-$id_utilisateur = $_SESSION['id_utilisateur'];
-$nom_utilisateur = $_SESSION['nom_utilisateur'];
-$role_utilisateur = $_SESSION['role_utilisateur'];
+if (
+    isset($_SESSION['role_utilisateur'], $_SESSION['logged_in']) &&
+    $_SESSION['role_utilisateur'] === "guide" &&
+    $_SESSION['logged_in'] === TRUE
+) {
+    $id_utilisateur = htmlspecialchars($_SESSION['id_utilisateur']);
+    $nom_utilisateur = htmlspecialchars($_SESSION['nom_utilisateur']);
+    $role_utilisateur = htmlspecialchars($_SESSION['id_utilisateur']);
 
 
-$tours = [];
-$sql = "SELECT * FROM visitesguidees WHERE id_guide = ? ORDER BY dateheure_viste DESC";
-$stmt = $conn->prepare($sql);
-$stmt->bind_param("i", $id_utilisateur);
-$stmt->execute();
-$resultat = $stmt->get_result();
 
-while ($ligne = $resultat->fetch_assoc()) {
-    $tours[] = $ligne;
+    $tours = [];
+    $sql = "SELECT * FROM visitesguidees WHERE id_guide = ? ORDER BY dateheure_viste DESC";
+    $stmt = $conn->prepare($sql);
+    $stmt->bind_param("i", $id_utilisateur);
+    $stmt->execute();
+    $resultat = $stmt->get_result();
+
+    while ($ligne = $resultat->fetch_assoc())
+        $tours[] = $ligne;
+}else {
+
+    header("Location: ../connexion.php?error=access_denied");
+    exit();
 }
 ?>
 <!DOCTYPE html>
@@ -99,15 +102,14 @@ while ($ligne = $resultat->fetch_assoc()) {
                     </a>
                 </nav>
             </div>
-            <div class="flex items-center gap-3 px-4 py-3 rounded-xl bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark shadow-sm">
-                <div class="bg-primary/20 rounded-full h-10 w-10 flex items-center justify-center border-2 border-primary text-primary font-bold">
-                    <?= substr($nom_utilisateur, 0, 1) ?>
-                </div>
-                <div class="flex flex-col overflow-hidden">
-                    <p class="text-sm font-bold truncate"><?= $nom_utilisateur ?></p>
-                    <p class="text-text-sec-light dark:text-text-sec-dark text-xs truncate capitalize"><?= $role_utilisateur ?></p>
-                </div>
-            </div>
+           <div class="border-t border-gray-200 dark:border-gray-800 pt-4 px-2">
+                 <div class="flex items-center gap-3">
+
+                     <div class="flex flex-col">
+                         <a href="../php/seconnecter.php" class="text-xs text-text-secondary-light dark:text-text-secondary-dark">se deconnecter</a>
+                     </div>
+                 </div>
+             </div>
         </aside>
 
         <main class="flex-1 flex flex-col h-full overflow-y-auto">
