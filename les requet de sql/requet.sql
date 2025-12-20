@@ -57,6 +57,8 @@ CREATE TABLE visitesguidees (
     FOREIGN KEY (id_guide) REFERENCES utilisateurs (id_utilisateur) on delete CASCADE
 );
 
+UPDATE utilisateurs set statut_utilisateur = 1 WHERE id_utilisateur= ;
+
 CREATE TABLE etapesvisite (
     id_etape INT PRIMARY KEY AUTO_INCREMENT,
     titre_etape VARCHAR(255) NOT NULL,

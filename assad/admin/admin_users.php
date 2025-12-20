@@ -12,14 +12,37 @@
         $nom_utilisateur = htmlspecialchars($_SESSION['nom_utilisateur']);
         $role_utilisateur = htmlspecialchars($_SESSION['role_utilisateur']);
 
-        $sql = " SELECT * FROM utilisateurs order by Approuver_utilisateur   ";
+        if ($_SERVER['REQUEST_METHOD'] === "POST" && isset($_POST['id_Approuver_utilisateur'])) {
+            $id_Approuver_utilisateur = $_POST['id_Approuver_utilisateur'];
+            $sql = "UPDATE utilisateurs set `Approuver_utilisateur` = 1 WHERE id_utilisateur=  ?";
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("i", $id_Approuver_utilisateur);
+            $stmt->execute();
+            $stmt->close();
+        }
+        if ($_SERVER['REQUEST_METHOD'] === "POST" && (isset($_POST['id_activer']) or isset($_POST['id_suspendu']))) {
+            if (!empty($_POST['id_activer'])) {
+                $id_utilisateur = $_POST['id_activer'];
+                $sql = "UPDATE utilisateurs set statut_utilisateur = 0 WHERE id_utilisateur = ?";
+            } else {
+                $id_utilisateur = $_POST['id_suspendu'];
+                $sql = "UPDATE utilisateurs set statut_utilisateur = 1 WHERE id_utilisateur = ?";
+            }
+            $stmt = $conn->prepare($sql);
+            $stmt->bind_param("i", $id_utilisateur);
+            $stmt->execute();
+            $stmt->close();
+        }
+
+
+        $sql = " SELECT * FROM utilisateurs where role != 'admin' order by Approuver_utilisateur   ";
         $resultat = $conn->query($sql);
 
         $array_utilisateurs = array();
         while ($ligne =  $resultat->fetch_assoc())
             array_push($array_utilisateurs, $ligne);
 
-       
+
 
         function get_role_badge($role)
         {
@@ -215,7 +238,7 @@
                                          Actions</th>
                                  </tr>
                              </thead>
-                             <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
+                             <tbody id="card-user" class="divide-y divide-gray-100 dark:divide-gray-800">
                                  <?php foreach ($array_utilisateurs as $user) : ?>
                                      <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors group">
                                          <td class="px-6 py-3">
@@ -239,35 +262,46 @@
                                          <td class="px-6 py-3 text-right">
                                              <div
                                                  class="flex items-center justify-end gap-1">
+                                                 
                                                  <button
                                                      class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-blue-500"
                                                      title="Voir/Éditer le profil">
                                                      <span class="material-symbols-outlined text-lg">visibility</span>
                                                  </button>
                                                  <?php if ($user['statut_utilisateur'] === '0'): ?>
-                                                     <button
-                                                         class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-yellow-500"
-                                                         title="Suspendre">
-                                                         <span class="material-symbols-outlined text-lg">lock</span>
-                                                     </button>
+                                                     <form action="" method="POST">
+                                                         <input type="hidden" name="id_suspendu" value="<?= $user['id_utilisateur'] ?>">
+                                                         <button
+                                                             class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-yellow-500"
+                                                             title="Suspendre">
+                                                             <span class="material-symbols-outlined text-lg">lock</span>
+                                                         </button>
+                                                     </form>
                                                  <?php else: ?>
-                                                     <button
-                                                         class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-green-500"
-                                                         title="Activer">
-                                                         <span class="material-symbols-outlined text-lg">lock_open</span>
-                                                     </button>
-                                                 <?php endif; ?>
-                                                 <?php if ($user['role'] === 'guide' && $user['Approuver_utilisateur'] == 0): ?>
-                                                     <form action="" method="POST">*
-                                                 <?php if ($user['role'] === 'guide' && $user['Approuver_utilisateur'] == 0): ?>
-                                                        <input type="hidden" name="id_">
-                                                        <button
-                                                         class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-red-500"
-                                                         title="Approuver ">
-                                                         <span class="material-symbols-outlined text-lg">check_circle</span>
-                                                     </button>
+                                                     <form action="" method="POST">
+                                                         <input type="hidden" name="id_activer" value="<?= $user['id_utilisateur'] ?>">
+                                                         <button
+                                                             class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-green-500"
+                                                             title="Activer">
+                                                             <span class="material-symbols-outlined text-lg">lock_open</span>
+                                                         </button>
                                                      </form>
                                                  <?php endif; ?>
+
+                                                 <?php if ($user['role'] === 'guide' && $user['Approuver_utilisateur'] == 0): ?>
+                                                     <form action="" method="POST" class="Approuver_utilisateur">
+                                                         <input type="hidden" name="id_Approuver_utilisateur" value="<?= $user['id_utilisateur'] ?>">
+                                                         <button type="button"
+                                                             class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-red-500"
+                                                             title="Approuver ">
+                                                             <span class="material-symbols-outlined text-lg">check_circle</span>
+                                                         </button>
+                                                     </form>
+                                                 <?php endif; ?>
+
+
+
+
                                              </div>
                                          </td>
                                      </tr>
@@ -282,10 +316,20 @@
                      </div>
                  </div>
              </div>
-             
+
          </div>
      </main>
-
+     <script>
+         document.getElementById('card-user').addEventListener('click', (e) => {
+             const ele_click = e.target;
+             if (ele_click.tagName === 'SPAN') {
+                 const form = ele_click.closest('form.Approuver_utilisateur');
+                 if (form)
+                     if (confirm("veullez vous"))
+                         form.submit();
+             }
+         });
+     </script>
  </body>
 
  </html>
