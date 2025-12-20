@@ -12,58 +12,41 @@
         $nom_utilisateur = htmlspecialchars($_SESSION['nom_utilisateur']);
         $role_utilisateur = htmlspecialchars($_SESSION['role_utilisateur']);
 
+        $sql = " SELECT * FROM utilisateurs order by Approuver_utilisateur   ";
+        $resultat = $conn->query($sql);
 
-        $users = [
-            ['id' => 101, 'name' => 'Jean-Marc Dupont', 'email' => 'jm.dupont@assad.ma', 'role' => 'admin', 'status' => 'active', 'last_login' => '2025-12-15 14:30'],
-            ['id' => 205, 'name' => 'Amine El Fassi', 'email' => 'amine.elfassi@assad.ma', 'role' => 'guide', 'status' => 'active', 'last_login' => '2025-12-16 09:15'],
-            ['id' => 312, 'name' => 'Sarah Cherif', 'email' => 'sarah.cherif@visitor.com', 'role' => 'visitor', 'status' => 'active', 'last_login' => '2025-12-16 10:05'],
-            ['id' => 208, 'name' => 'Yasmine Belkadi', 'email' => 'yasmine.belkadi@assad.ma', 'role' => 'guide', 'status' => 'inactive', 'last_login' => '2025-11-01 11:20'],
-            ['id' => 301, 'name' => 'Pierre Leroy', 'email' => 'pierre.leroy@visitor.com', 'role' => 'visitor', 'status' => 'active', 'last_login' => '2025-12-15 18:00'],
-            ['id' => 350, 'name' => 'Fatima Zahra', 'email' => 'fatima.zahra@visitor.com', 'role' => 'visitor', 'status' => 'suspended', 'last_login' => '2025-12-14 20:45'],
-        ];
+        $array_utilisateurs = array();
+        while ($ligne =  $resultat->fetch_assoc())
+            array_push($array_utilisateurs, $ligne);
 
-        // Fonction utilitaire pour le badge de rôle
+       
+
         function get_role_badge($role)
         {
             return match ($role) {
                 'admin' => '<span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-300">Admin</span>',
                 'guide' => '<span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300">Guide</span>',
-                'visitor' => '<span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300">Visiteur</span>',
+                'visiteur' => '<span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-green-100 text-green-700 dark:bg-green-900/40 dark:text-green-300">Visiteur</span>',
                 default => '<span class="text-xs font-semibold px-2 py-0.5 rounded-full bg-gray-100 text-gray-700 dark:bg-gray-700/40 dark:text-gray-300">Inconnu</span>',
             };
         }
 
-        // Fonction utilitaire pour le badge de statut
         function get_status_indicator($status)
         {
             return match ($status) {
-                'active' => '<span class="w-2 h-2 rounded-full bg-green-500 inline-block mr-1" title="Actif"></span>',
-                'inactive' => '<span class="w-2 h-2 rounded-full bg-yellow-500 inline-block mr-1" title="Inactif"></span>',
-                'suspended' => '<span class="w-2 h-2 rounded-full bg-red-500 inline-block mr-1" title="Suspendu"></span>',
+                '1' => '<span class="    text-green-500 inline-block mr-1" title="Actif">Actif</span>',
+                '0' => '<span class="  text-red-500 inline-block mr-1" title="Suspendu">Suspendu</span>',
                 default => '',
             };
         }
 
-        // Fonction pour formater la dernière connexion
-        function format_last_login($date_time)
+        function get_status_indicator_color($status)
         {
-            $now = new DateTime();
-            $last_login = new DateTime($date_time);
-            $interval = $now->diff($last_login);
-
-            if ($interval->y >= 1) {
-                return $last_login->format('d/m/Y');
-            } elseif ($interval->m >= 1) {
-                return $interval->m . ' mois';
-            } elseif ($interval->d >= 1) {
-                return $interval->d . ' j';
-            } elseif ($interval->h >= 1) {
-                return $interval->h . ' h';
-            } elseif ($interval->i >= 1) {
-                return $interval->i . ' min';
-            } else {
-                return 'maintenant';
-            }
+            return match ($status) {
+                '1' => '<span class="w-2 h-2 rounded-full bg-green-500 inline-block mr-1" title="Actif"></span>',
+                '0' => '<span class="w-2 h-2 rounded-full bg-red-500 inline-block mr-1" title="Suspendu"></span>',
+                default => '',
+            };
         }
     } else {
         // Redirection de sécurité
@@ -158,7 +141,7 @@
                              class="material-symbols-outlined text-2xl fill-current">group</span>
                          <span class="text-sm font-medium">Utilisateurs</span>
                      </a>
-                      
+
                  </nav>
              </div>
              <div class="border-t border-gray-200 dark:border-gray-800 pt-4 px-2">
@@ -182,14 +165,9 @@
                              Contrôle total sur les comptes Guides et Visiteurs
                          </p>
                      </div>
-                     <div class="flex items-center gap-3">
-                         <button
-                             class="flex items-center gap-2 px-4 py-2 rounded-lg bg-green-600 hover:bg-green-700 text-white shadow-lg shadow-green-600/30 transition-all text-sm font-bold">
-                             <span class="material-symbols-outlined text-lg">person_add</span>
-                             Ajouter Utilisateur
-                         </button>
-                     </div>
+
                  </div>
+             </div>
              </div>
          </header>
          <div class="flex-1 overflow-y-auto bg-background-light dark:bg-background-dark">
@@ -197,17 +175,20 @@
 
                  <div class="flex flex-col md:flex-row justify-between items-center gap-4 p-4 bg-surface-light dark:bg-surface-dark rounded-xl border border-gray-100 dark:border-gray-800 shadow-sm">
                      <div class="flex flex-wrap gap-3">
-                         <button class="px-4 py-2 text-sm font-bold rounded-lg bg-primary text-white shadow-sm">Tous (<?= count($users) ?>)</button>
-                         <button class="px-4 py-2 text-sm font-medium rounded-lg bg-gray-100 dark:bg-gray-800 text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Guides (<?= count(array_filter($users, fn($u) => $u['role'] === 'guide')) ?>)</button>
-                         <button class="px-4 py-2 text-sm font-medium rounded-lg bg-gray-100 dark:bg-gray-800 text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Visiteurs (<?= count(array_filter($users, fn($u) => $u['role'] === 'visitor')) ?>)</button>
+                         <button class="px-4 py-2 text-sm font-bold rounded-lg bg-primary text-white shadow-sm">Tous (<?= count($array_utilisateurs) ?>)</button>
+                         <button class="px-4 py-2 text-sm font-medium rounded-lg bg-gray-100 dark:bg-gray-800 text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Guides (<?= count(array_filter($array_utilisateurs, fn($u) => $u['role'] === 'guide')) ?>)</button>
+                         <button class="px-4 py-2 text-sm font-medium rounded-lg bg-gray-100 dark:bg-gray-800 text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Visiteurs (<?= count(array_filter($array_utilisateurs, fn($u) => $u['role'] === 'visiteur')) ?>)</button>
+                         <button class="px-4 py-2 text-sm font-medium rounded-lg bg-gray-100 dark:bg-gray-800 text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Actif (<?= count(array_filter($array_utilisateurs, fn($u) => $u['statut_utilisateur'] === '1')) ?>)</button>
+                         <button class="px-4 py-2 text-sm font-medium rounded-lg bg-gray-100 dark:bg-gray-800 text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Suspendu (<?= count(array_filter($array_utilisateurs, fn($u) => $u['statut_utilisateur'] === '0')) ?>)</button>
+                         <button class="px-4 py-2 text-sm font-medium rounded-lg bg-gray-100 dark:bg-gray-800 text-text-secondary-light dark:text-text-secondary-dark hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors">Approuver (<?= count(array_filter($array_utilisateurs, fn($u) => $u['Approuver_utilisateur'] === '0')) ?>)</button>
                      </div>
-                     <div class="relative w-full md:w-auto">
+                     <!-- <div class="relative w-full md:w-auto">
                          <span
                              class="material-symbols-outlined absolute left-2.5 top-1/2 -translate-y-1/2 text-gray-400 text-sm">search</span>
                          <input
                              class="pl-8 pr-3 py-1.5 rounded-lg border-gray-200 dark:border-gray-700 bg-white dark:bg-surface-dark text-sm w-full md:w-64 focus:ring-primary/20 focus:border-primary"
                              placeholder="Rechercher par nom ou email..." type="text" />
-                     </div>
+                     </div> -->
                  </div>
 
                  <div
@@ -228,19 +209,19 @@
                                          Statut</th>
                                      <th
                                          class="px-6 py-3 font-semibold text-text-secondary-light dark:text-text-secondary-dark">
-                                         Dernière Connexion</th>
+                                         Origine</th>
                                      <th
                                          class="px-6 py-3 font-semibold text-text-secondary-light dark:text-text-secondary-dark text-right">
                                          Actions</th>
                                  </tr>
                              </thead>
                              <tbody class="divide-y divide-gray-100 dark:divide-gray-800">
-                                 <?php foreach ($users as $user) : ?>
+                                 <?php foreach ($array_utilisateurs as $user) : ?>
                                      <tr class="hover:bg-gray-50/50 dark:hover:bg-gray-800/50 transition-colors group">
                                          <td class="px-6 py-3">
                                              <div class="flex items-center gap-3">
                                                  <div class="flex flex-col">
-                                                     <span class="font-bold text-text-light dark:text-text-dark"><?= htmlspecialchars($user['name']) ?></span>
+                                                     <span class="font-bold text-text-light dark:text-text-dark"><?= htmlspecialchars($user['nom_utilisateur']) ?></span>
                                                      <span class="text-xs text-text-secondary-light truncate"><?= htmlspecialchars($user['email']) ?></span>
                                                  </div>
                                              </div>
@@ -249,11 +230,11 @@
                                              <?= get_role_badge($user['role']) ?>
                                          </td>
                                          <td class="px-6 py-3">
-                                             <?= get_status_indicator($user['status']) ?>
-                                             <span class="text-xs text-gray-500 capitalize"><?= htmlspecialchars($user['status']) ?></span>
+                                             <?= get_status_indicator_color(htmlspecialchars($user['statut_utilisateur'])) ?>
+                                             <span class="text-xs text-gray-500 capitalize"><?= get_status_indicator(htmlspecialchars($user['statut_utilisateur'])) ?></span>
                                          </td>
                                          <td class="px-6 py-3 text-text-secondary-light">
-                                             Il y a <?= format_last_login($user['last_login']) ?>
+                                             <?= htmlspecialchars($user["pays_utilisateur"]) ?>
                                          </td>
                                          <td class="px-6 py-3 text-right">
                                              <div
@@ -263,7 +244,7 @@
                                                      title="Voir/Éditer le profil">
                                                      <span class="material-symbols-outlined text-lg">visibility</span>
                                                  </button>
-                                                 <?php if ($user['status'] === 'active'): ?>
+                                                 <?php if ($user['statut_utilisateur'] === '0'): ?>
                                                      <button
                                                          class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-yellow-500"
                                                          title="Suspendre">
@@ -276,12 +257,16 @@
                                                          <span class="material-symbols-outlined text-lg">lock_open</span>
                                                      </button>
                                                  <?php endif; ?>
-                                                 <?php if ($user['role'] !== 'admin'): ?>
-                                                     <button
+                                                 <?php if ($user['role'] === 'guide' && $user['Approuver_utilisateur'] == 0): ?>
+                                                     <form action="" method="POST">*
+                                                 <?php if ($user['role'] === 'guide' && $user['Approuver_utilisateur'] == 0): ?>
+                                                        <input type="hidden" name="id_">
+                                                        <button
                                                          class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-red-500"
-                                                         title="Supprimer">
-                                                         <span class="material-symbols-outlined text-lg">delete</span>
+                                                         title="Approuver ">
+                                                         <span class="material-symbols-outlined text-lg">check_circle</span>
                                                      </button>
+                                                     </form>
                                                  <?php endif; ?>
                                              </div>
                                          </td>
@@ -289,7 +274,7 @@
                                  <?php endforeach; ?>
                              </tbody>
                          </table>
-                         <?php if (empty($users)): ?>
+                         <?php if (empty($array_utilisateurs)): ?>
                              <div class="p-6 text-center text-text-secondary-light dark:text-text-secondary-dark text-sm">
                                  Aucun utilisateur trouvé.
                              </div>
@@ -297,10 +282,7 @@
                      </div>
                  </div>
              </div>
-             <div class="pb-6 text-center">
-                 <p class="text-[10px] text-gray-300 uppercase tracking-[0.2em] font-bold">Inspiré par la force des Lions
-                     de l'Atlas</p>
-             </div>
+             
          </div>
      </main>
 

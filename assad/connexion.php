@@ -186,6 +186,18 @@
                          </div>
 
                          <div class="flex flex-col gap-2">
+                             <label class="text-sm font-bold text-text-main dark:text-white" for="Pays">Pays</label>
+                             <div class="relative">
+                                 <div class="absolute left-3 top-1/2 -translate-y-1/2 text-text-muted">
+                                     <span class="material-symbols-outlined text-[20px]">add</span>
+                                 </div>
+                                 <input name="pays"
+                                     class="w-full h-12 pl-10 pr-4 bg-white dark:bg-white/5 border border-[#e7dbcf] dark:border-white/10 rounded-lg text-sm text-text-main dark:text-white placeholder:text-text-muted/70 focus:outline-none focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all"
+                                     id="pays" placeholder="Votre Pays" type="text" required />
+                             </div>
+                         </div>
+
+                         <div class="flex flex-col gap-2">
                              <label class="text-xs font-semibold uppercase tracking-wider text-text-muted ml-1">Je
                                  m'inscris en tant que</label>
                              <div class="bg-[#f3ede7] dark:bg-white/5 p-1 rounded-xl flex h-12 relative">
