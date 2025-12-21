@@ -8,9 +8,9 @@ if (
     $_SESSION['role_utilisateur'] === "guide" &&
     $_SESSION['logged_in'] === TRUE
 ) {
-    $id_utilisateur = htmlspecialchars($_SESSION['id_utilisateur']);
-    $nom_utilisateur = htmlspecialchars($_SESSION['nom_utilisateur']);
-    $role_utilisateur = htmlspecialchars($_SESSION['id_utilisateur']);
+    $id_utilisateur = ($_SESSION['id_utilisateur']);
+    $nom_utilisateur = ($_SESSION['nom_utilisateur']);
+    $role_utilisateur = ($_SESSION['id_utilisateur']);
 
 
 
@@ -181,18 +181,18 @@ if (
                                 <?php foreach ($array_participants as $participant) : ?>
                                     <tr class="hover:bg-background-light dark:hover:bg-white/5 transition-colors">
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm font-medium text-text-main-light dark:text-text-main-dark"><?= htmlspecialchars($participant['nom_utilisateur']) ?></div>
-                                            <div class="text-xs text-text-sec-light dark:text-text-sec-dark">Réf:Visite- <?= htmlspecialchars($participant['id_visite']) ?></div>
+                                            <div class="text-sm font-medium text-text-main-light dark:text-text-main-dark"><?= ($participant['nom_utilisateur']) ?></div>
+                                            <div class="text-xs text-text-sec-light dark:text-text-sec-dark">Réf:Visite- <?= ($participant['id_visite']) ?></div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm text-text-main-light dark:text-text-main-dark line-clamp-1"><?= htmlspecialchars($participant['titre_visite']) ?></div>
+                                            <div class="text-sm text-text-main-light dark:text-text-main-dark line-clamp-1"><?= ($participant['titre_visite']) ?></div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
                                             <div class="text-sm text-text-main-light dark:text-text-main-dark"><?= (new DateTime($participant['dateheure_viste']))->format('d M Y') ?></div>
                                             <div class="text-xs text-text-sec-light dark:text-text-sec-dark"><?= (new DateTime($participant['dateheure_viste']))->format('h : m')  ?></div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-center">
-                                            <span class="text-sm font-bold"><?= htmlspecialchars($participant['nb_personnes']) ?></span>
+                                            <span class="text-sm font-bold"><?= ($participant['nb_personnes']) ?></span>
                                         </td>
                                     </tr>
                                 <?php endforeach; ?>

@@ -1,18 +1,20 @@
  <?php
     session_start();
-  
+
     include "../db_connect.php";
 
-   if (
+    if (
         isset($_SESSION['role_utilisateur'], $_SESSION['logged_in'], $_SESSION['id_utilisateur']) &&
         $_SESSION['role_utilisateur'] === "visiteur" &&
         $_SESSION['logged_in'] === TRUE
     ) {
 
 
-        $id_utilisateur = htmlspecialchars($_SESSION['id_utilisateur']);
-        $nom_utilisateur = htmlspecialchars($_SESSION['nom_utilisateur']);
-        $role_utilisateur = htmlspecialchars($_SESSION['role_utilisateur']);
+        $id_utilisateur = ($_SESSION['id_utilisateur']);
+        $nom_utilisateur = ($_SESSION['nom_utilisateur']);
+        $role_utilisateur = ($_SESSION['role_utilisateur']);
+
+
 
         $sql = " select * from  utilisateurs where role='guide' ";
         $resultat = $conn->query($sql);
@@ -21,12 +23,35 @@
         while ($ligne =  $resultat->fetch_assoc())
             array_push($array_guides, $ligne);
 
-        $sql = " select * from  visitesguidees  inner join  utilisateurs  on id_utilisateur =id_guide  ";
-        $resultat = $conn->query($sql);
+        $sql = "SELECT * FROM visitesguidees  WHERE 1=1";
 
-        $array_visites = array();
-        while ($ligne =  $resultat->fetch_assoc())
-            array_push($array_visites, $ligne);
+        if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+
+
+
+            // filter par date_filter
+            if (!empty($_POST['date_filter'])) {
+                $sql .= " AND dateheure_viste <= " . $_POST['date_filter'];
+            }
+
+            // Filtre par typr guide_filter
+            if (!empty($_POST['guide_filter'])) {
+                $sql .= " AND id_guide = '" . $_POST['guide_filter'] . "'";
+            }
+        }
+
+        try {
+            $resultat = $conn->query($sql);
+            $array_visites = array();
+            while ($ligne =  $resultat->fetch_assoc())
+                array_push($array_visites, $ligne);
+        } catch (Exception $e) {
+
+            error_log(date('Y-m-d H:i:s') . " - Erreur Recherche visite : " . $e->getMessage() . PHP_EOL, 3, "../error.log");
+            $array_visites = array();
+            while ($ligne =  $resultat->fetch_assoc())
+                array_push($array_visites, $ligne);
+        }
     } else {
         header("Location: ../connexion.php?error=access_denied");
         exit();
@@ -35,42 +60,6 @@
 
 
 
-    $sql = "SELECT a.*, h.nom_habitat 
-        FROM animaux a 
-        JOIN habitats h ON a.id_habitat = h.id_habitat 
-        WHERE 1=1";
-
-
-
-    if ($_SERVER['REQUEST_METHOD'] === 'POST') {
-
-        if (!empty($_POST['search'])) {
-            $sql .= " AND a.nom_animal LIKE '" . $_POST['search'] . "%'";
-        }
-
-        // filter par Habitat
-        if (!empty($_POST['id_habitat'])) {
-            $sql .= " AND a.id_habitat = " . $_POST['id_habitat'];
-        }
-
-        // Filtre par typr alimentation
-        if (!empty($_POST['alimentation_animal'])) {
-            $sql .= " AND a.alimentation_animal = '" . $_POST['alimentation_animal'] . "'";
-        }
-    }
-
-    try {
-        $resultat = $conn->query($sql);
-        $array_animaux = array();
-        while ($ligne =  $resultat->fetch_assoc())
-            array_push($array_animaux, $ligne);
-    } catch (Exception $e) {
-
-        error_log(date('Y-m-d H:i:s') . " - Erreur Recherche Animaux : " . $e->getMessage() . PHP_EOL, 3, "../error.log");
-        $array_animaux = array();
-        while ($ligne =  $resultat->fetch_assoc())
-            array_push($array_animaux, $ligne);
-    }
 
 
 
@@ -84,7 +73,6 @@
 
 
 
- 
 
     ?>
 
@@ -155,7 +143,9 @@
                          <a class="text-primary text-sm font-bold hover:text-primary transition-colors"
                              href="reservation.php">Réservation</a>
                          <a class="text-[#1b140d] text-sm font-medium hover:text-primary transition-colors"
-                             href="#">CAN 2025</a>
+                             href="./mes_reservations.php">Mes Reservations</a>
+                         <a class="text-[#1b140d] text-sm font-medium hover:text-primary transition-colors"
+                             href="./../php/sedeconnecter.php"> Se Deconnecter</a>
                      </div>
 
                  </div>
@@ -187,7 +177,7 @@
                  </div>
              </div>
 
-             <sec"tion id="reservations" class="mb-16">
+             <section id="reservations" class="mb-16">
                  <h2 class="text-3xl font-extrabold text-[#1b140d] mb-8 text-center border-b border-primary/20 pb-4">Sessions Disponibles</h2>
 
                  <form method="POST" action="" class="flex flex-col md:flex-row justify-between items-center gap-4 p-4 bg-white rounded-xl shadow-lg border border-[#f3ede7] mb-8">
@@ -201,7 +191,7 @@
                              <option value="">Tous les Guides</option>
                              <?php foreach ($array_guides as $guide): ?>
                                  <option value="<?= $guide["id_utilisateur"] ?>" <?= (isset($_POST['guide_filter']) && $_POST['guide_filter'] == $guide["id_utilisateur"]) ? 'selected' : '' ?>>
-                                     <?= htmlspecialchars($guide["nom_utilisateur"]) ?>
+                                     <?= ($guide["nom_utilisateur"]) ?>
                                  </option>
                              <?php endforeach; ?>
                          </select>
@@ -244,10 +234,10 @@
                              <div class="flex flex-col justify-between flex-1 gap-4">
                                  <div>
                                      <h4 class="text-xl font-bold mb-1 hover:text-primary transition-colors cursor-pointer text-[#1b140d] dark:text-white">
-                                         <?= htmlspecialchars($visit['titre_visite']) ?>
+                                         <?= ($visit['titre_visite']) ?>
                                      </h4>
                                      <p class="text-sm text-gray-600 dark:text-gray-400 line-clamp-2 mb-2">
-                                         <?= htmlspecialchars($visit['description_visite']) ?>.
+                                         <?= ($visit['description_visite']) ?>.
 
                                      </p>
 
@@ -258,11 +248,11 @@
                                          </div>
                                          <div class="flex items-center gap-1">
                                              <span class="material-symbols-outlined text-primary text-[18px]">group</span>
-                                             <span><?= $is_full ? 'Complet' : '11 places dispo.' ?></span>
+                                             <span><?= $is_full ? 'Complet' : $visit["capacite_max__visite"] . ' places dispo.' ?></span>
                                          </div>
                                          <div class="flex items-center gap-1">
                                              <span class="material-symbols-outlined text-primary text-[18px]">payments</span>
-                                             <span class="font-bold text-green-600"><?= htmlspecialchars($visit['prix__visite']) ?>€</span>
+                                             <span class="font-bold text-green-600"><?= ($visit['prix__visite']) ?>€</span>
                                          </div>
                                      </div>
                                  </div>
@@ -274,7 +264,7 @@
                                      </a>
 
                                      <?php if (!$is_full) : ?>
-                                        
+
                                          <form action="php/traiter_reservation.php" method="POST" class="reservation-form">
                                              <input type="hidden" name="id_visite" value="<?= $visit['id_visite'] ?>">
                                              <input type="hidden" name="id_utilisateur" value="<?= $_SESSION['id_utilisateur'] ?>">
@@ -305,7 +295,7 @@
                      <?php endif; ?>
                  </div>
 
-                 </section>
+             </section>
          </div>
      </main>
 

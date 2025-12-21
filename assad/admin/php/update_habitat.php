@@ -1,11 +1,9 @@
 <?php
 session_start();
-include "../../db_connect.php"; // Ajustez le chemin selon votre structure
-
-// 1. Vérification de l'accès (Admin uniquement)
+include "../../db_connect.php";
 if (
-    !isset($_SESSION['role_utilisateur'], $_SESSION['logged_in']) || 
-    $_SESSION['role_utilisateur'] !== "admin" || 
+    !isset($_SESSION['role_utilisateur'], $_SESSION['logged_in']) ||
+    $_SESSION['role_utilisateur'] !== "admin" ||
     $_SESSION['logged_in'] !== true
 ) {
     header("Location: ../connexion.php?error=access_denied");
@@ -13,7 +11,7 @@ if (
 }
 
 if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['id_habitat'])) {
-    
+
     $id_habitat = intval($_POST['id_habitat']);
     $nom = htmlspecialchars(trim($_POST['nom_habitat']));
     $climat = htmlspecialchars(trim($_POST['type_climat']));
@@ -21,7 +19,7 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['id_habitat'])) {
     $description = htmlspecialchars(trim($_POST['description_habitat']));
 
     if (!empty($nom) && !empty($climat) && !empty($zone)) {
-        
+
         $sql = "UPDATE habitats 
                 SET nom_habitat = ?, 
                     type_climat = ?, 
@@ -52,4 +50,3 @@ if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['id_habitat'])) {
 
 $conn->close();
 exit();
-?>

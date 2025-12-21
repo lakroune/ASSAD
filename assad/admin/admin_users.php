@@ -7,9 +7,9 @@
         $_SESSION['role_utilisateur'] === "admin" &&
         $_SESSION['logged_in'] === TRUE
     ) {
-        $id_utilisateur = htmlspecialchars($_SESSION['id_utilisateur']);
-        $nom_utilisateur = htmlspecialchars($_SESSION['nom_utilisateur']);
-        $role_utilisateur = htmlspecialchars($_SESSION['role_utilisateur']);
+        $id_utilisateur = ($_SESSION['id_utilisateur']);
+        $nom_utilisateur = ($_SESSION['nom_utilisateur']);
+        $role_utilisateur = ($_SESSION['role_utilisateur']);
 
         if ($_SERVER['REQUEST_METHOD'] === "POST" && isset($_POST['id_Approuver_utilisateur'])) {
             $id_Approuver_utilisateur = $_POST['id_Approuver_utilisateur'];
@@ -254,8 +254,8 @@
                                          <td class="px-6 py-3">
                                              <div class="flex items-center gap-3">
                                                  <div class="flex flex-col">
-                                                     <span class="font-bold text-text-light dark:text-text-dark"><?= htmlspecialchars($user['nom_utilisateur']) ?></span>
-                                                     <span class="text-xs text-text-secondary-light truncate"><?= htmlspecialchars($user['email']) ?></span>
+                                                     <span class="font-bold text-text-light dark:text-text-dark"><?= ($user['nom_utilisateur']) ?></span>
+                                                     <span class="text-xs text-text-secondary-light truncate"><?= ($user['email']) ?></span>
                                                  </div>
                                              </div>
                                          </td>
@@ -263,17 +263,17 @@
                                              <?= get_role_badge($user['role']) ?>
                                          </td>
                                          <td class="px-6 py-3">
-                                             <?= get_status_indicator_color(htmlspecialchars($user['statut_utilisateur'])) ?>
-                                             <span class="text-xs text-gray-500 capitalize"><?= get_status_indicator(htmlspecialchars($user['statut_utilisateur'])) ?></span>
+                                             <?= get_status_indicator_color(($user['statut_utilisateur'])) ?>
+                                             <span class="text-xs text-gray-500 capitalize"><?= get_status_indicator(($user['statut_utilisateur'])) ?></span>
                                          </td>
                                          <td class="px-6 py-3 text-text-secondary-light">
-                                             <?= htmlspecialchars($user["pays_utilisateur"]) ?>
+                                             <?= ($user["pays_utilisateur"]) ?>
                                          </td>
                                          <td class="px-6 py-3 text-right">
                                              <div
                                                  class="flex items-center justify-end gap-1">
                                                  <!-- voici le button quand click sur il  ybano les info fi pop  -->
-                                                 <form action="" method="POST">
+                                                 <form action="" method="POST" class="visibility">
                                                      <input type="hidden" name="id_affiche" value="<?= $user['id_utilisateur'] ?>">
                                                      <button
                                                          class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-blue-500"
@@ -282,18 +282,18 @@
                                                      </button>
                                                  </form>
                                                  <?php if ($user['statut_utilisateur'] === '0'): ?>
-                                                     <form action="" method="POST">
+                                                     <form action="" method="POST" class="lock">
                                                          <input type="hidden" name="id_suspendu" value="<?= $user['id_utilisateur'] ?>">
-                                                         <button
+                                                         <button type="button"
                                                              class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-yellow-500"
                                                              title="Suspendre">
                                                              <span class="material-symbols-outlined text-lg">lock</span>
                                                          </button>
                                                      </form>
                                                  <?php else: ?>
-                                                     <form action="" method="POST">
+                                                     <form action="" method="POST" class="lock_open">
                                                          <input type="hidden" name="id_activer" value="<?= $user['id_utilisateur'] ?>">
-                                                         <button
+                                                         <button type="button"
                                                              class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-green-500"
                                                              title="Activer">
                                                              <span class="material-symbols-outlined text-lg">lock_open</span>
@@ -355,7 +355,7 @@
                          </div>
                          <div>
                              <h4 class="text-2xl font-black text-text-light dark:text-text-dark leading-tight">
-                                 <?= htmlspecialchars($info_utilisateur['nom_utilisateur']) ?>
+                                 <?= ($info_utilisateur['nom_utilisateur']) ?>
                              </h4>
                              <div class="flex gap-2 mt-1">
                                  <?= get_role_badge($info_utilisateur['role']) ?>
@@ -372,7 +372,7 @@
                              <p class="text-xs text-text-secondary-light dark:text-text-secondary-dark font-bold uppercase tracking-wider">Email</p>
                              <p class="flex items-center gap-2 font-medium truncate">
                                  <span class="material-symbols-outlined text-sm">mail</span>
-                                 <?= htmlspecialchars($info_utilisateur['email']) ?>
+                                 <?= ($info_utilisateur['email']) ?>
                              </p>
                          </div>
 
@@ -380,7 +380,7 @@
                              <p class="text-xs text-text-secondary-light dark:text-text-secondary-dark font-bold uppercase tracking-wider">Localisation</p>
                              <p class="flex items-center gap-2 font-medium">
                                  <span class="material-symbols-outlined text-sm">location_on</span>
-                                 <?= htmlspecialchars($info_utilisateur['pays_utilisateur'] ?? 'Non défini') ?>
+                                 <?= ($info_utilisateur['pays_utilisateur'] ?? 'Non défini') ?>
                              </p>
                          </div>
 
@@ -421,9 +421,18 @@
          document.getElementById('card-user').addEventListener('click', (e) => {
              const ele_click = e.target;
              if (ele_click.tagName === 'SPAN') {
-                 const form = ele_click.closest('form.Approuver_utilisateur');
+                 const form = ele_click.closest('form.lock_open');
                  if (form)
-                     if (confirm("Voulez-vous vraiment approuver le guide "))
+                     if (confirm("Voulez-vous vraiment  Suspender cet utilisateur "))
+                         form.submit();
+             }
+         });
+         document.getElementById('card-user').addEventListener('click', (e) => {
+             const ele_click = e.target;
+             if (ele_click.tagName === 'SPAN') {
+                 const form = ele_click.closest('form.lock');
+                 if (form)
+                     if (confirm("Voulez-vous vraiment activer cet utilisateur"))
                          form.submit();
              }
          });

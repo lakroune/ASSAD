@@ -1,6 +1,6 @@
 <?php
 
-$animal_id = isset($_GET['id']) ? htmlspecialchars($_GET['id']) : null;
+$animal_id = isset($_GET['id']) ? ($_GET['id']) : null;
 
 if ($animal_id) {
 
@@ -16,7 +16,7 @@ if ($animal_id) {
 
 
 
-        $id_utilisateur = htmlspecialchars($_SESSION['id_utilisateur']);
+        $id_utilisateur = ($_SESSION['id_utilisateur']);
 
 
 
@@ -93,19 +93,13 @@ if ($animal_id) {
                 </div>
                 <div class="hidden lg:flex flex-1 justify-end gap-8">
                     <div class="flex items-center gap-9">
-                        <a class="text-[#1b140d] text-sm font-medium hover:text-primary transition-colors"
-                            href="index.php">Accueil</a>
-                        <a class="text-primary text-sm font-bold hover:text-primary transition-colors"
-                            href="index.php">Animaux</a>
-                        <a class="text-[#1b140d] text-sm font-medium hover:text-primary transition-colors"
-                            href="#">CAN 2025</a>
-                        <a class="text-[#1b140d] text-sm font-medium hover:text-primary transition-colors"
-                            href="#">Billetterie</a>
+
+
                     </div>
-                    <button
+                    <a href="./reservation.php"
                         class="flex min-w-[84px] cursor-pointer items-center justify-center overflow-hidden rounded-xl h-10 px-4 bg-primary hover:bg-orange-600 transition-colors text-white text-sm font-bold leading-normal tracking-[0.015em]">
-                        <span class="truncate">Rejoindre</span>
-                    </button>
+                        <span class="truncate">reserver</span>
+                    </a>
                 </div>
                 <button class="lg:hidden text-[#1b140d]">
                     <span class="material-symbols-outlined">menu</span>
@@ -137,15 +131,15 @@ if ($animal_id) {
                         <div class="h-[450px] rounded-xl overflow-hidden relative shadow-2xl shadow-primary/20">
                             <img alt="<?= $animal['nom_animal'] ?>"
                                 class="w-full h-full object-cover"
-                                src="<?= htmlspecialchars($animal['image_url']) ?>" />
+                                src="<?= ($animal['image_url']) ?>" />
                             <div class="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent"></div>
                             <div class="absolute bottom-6 left-6 text-white">
                                 <span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-primary text-white text-sm font-bold shadow-lg mb-2">
                                     <span class="material-symbols-outlined text-[18px]">stars</span>
-                                    <?= htmlspecialchars($animal['alimentation_animal']) ?>
+                                    <?= ($animal['alimentation_animal']) ?>
                                 </span>
-                                <h1 class="text-5xl font-black tracking-tight drop-shadow-lg"><?= htmlspecialchars($animal['nom_animal']) ?></h1>
-                                <p class="text-xl text-white/90 italic font-medium mt-1 drop-shadow-md"><?= htmlspecialchars($animal['espece']) ?></p>
+                                <h1 class="text-5xl font-black tracking-tight drop-shadow-lg"><?= ($animal['nom_animal']) ?></h1>
+                                <p class="text-xl text-white/90 italic font-medium mt-1 drop-shadow-md"><?= ($animal['espece']) ?></p>
                             </div>
                         </div>
 
@@ -157,33 +151,33 @@ if ($animal_id) {
 
 
                         <div class="bg-white p-6 rounded-xl shadow-lg border border-[#f3ede7]">
-                            <h2 class="text-2xl font-bold text-primary mb-4 border-b border-gray-100 pb-2">À Propos de <?= htmlspecialchars($animal['nom_animal']) ?></h2>
-                            
+                            <h2 class="text-2xl font-bold text-primary mb-4 border-b border-gray-100 pb-2">À Propos de <?= ($animal['nom_animal']) ?></h2>
+
                             <div class="flex flex-wrap gap-4 mt-2 pt-2  border-gray-100">
                                 <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-orange-50 text-orange-600 text-sm font-bold">
                                     <span class="material-symbols-outlined text-lg">public</span>
-                                    <?= htmlspecialchars($animal['pays_origine']) ?>
+                                    <?= ($animal['pays_origine']) ?>
                                 </span>
                                 <span class="inline-flex items-center gap-2 px-3 py-1.5 rounded-full bg-red-50 text-red-600 text-sm font-bold">
                                     <span class="material-symbols-outlined text-lg">eco</span>
-                                    <?= htmlspecialchars($animal['nom_habitat']) ?>
+                                    <?= ($animal['nom_habitat']) ?>
                                 </span>
                             </div>
-                            <p class="text-gray-700 leading-relaxed border-b  m-2 p-2"><?= htmlspecialchars($animal['description_animal']) ?></p>
+                            <p class="text-gray-700 leading-relaxed border-b  m-2 p-2"><?= ($animal['description_animal']) ?></p>
 
 
 
                             <p class="text-gray-700 leading-relaxed"> </p>
 
                             <ul class="space-y-3 text-sm text-gray-700">
-                                <li class="flex justify-between items-center"><span class="font-medium">Nom  :</span> <span class="italic"><?= htmlspecialchars($animal['nom_animal']) ?></span></li>
-                                <li class="flex justify-between items-start"><span class="font-medium"> Régime :</span> <span class="w-1/2 text-right"><?= htmlspecialchars($animal['alimentation_animal']) ?></span></li>
-                                <li class="flex justify-between items-start"><span class="font-medium"> Habitat :</span> <span class="w-1/2 text-right"><?= htmlspecialchars($animal['nom_habitat']) ?></span></li>
-                                <li class="flex justify-between items-start"><span class="font-medium"> Type de climat :</span> <span class="w-1/2 text-right"><?= htmlspecialchars($animal['type_climat']) ?></span></li>
-                                <li class="flex justify-between items-start"><span class="font-medium"> zone :</span> <span class="w-1/2 text-right"><?= htmlspecialchars($animal['zone_zoo']) ?></span></li>
+                                <li class="flex justify-between items-center"><span class="font-medium">Nom :</span> <span class="italic"><?= ($animal['nom_animal']) ?></span></li>
+                                <li class="flex justify-between items-start"><span class="font-medium"> Régime :</span> <span class="w-1/2 text-right"><?= ($animal['alimentation_animal']) ?></span></li>
+                                <li class="flex justify-between items-start"><span class="font-medium"> Habitat :</span> <span class="w-1/2 text-right"><?= ($animal['nom_habitat']) ?></span></li>
+                                <li class="flex justify-between items-start"><span class="font-medium"> Type de climat :</span> <span class="w-1/2 text-right"><?= ($animal['type_climat']) ?></span></li>
+                                <li class="flex justify-between items-start"><span class="font-medium"> zone :</span> <span class="w-1/2 text-right"><?= ($animal['zone_zoo']) ?></span></li>
                                 <li class="flex justify-between items-start"><span class="font-medium"> Description d'habitat :</span> <span class="w-1/2 text-right"> </span></li>
                             </ul>
-                            <p class="text-gray-700 leading-relaxed"><?= htmlspecialchars($animal['description_habitat']) ?></p>
+                            <p class="text-gray-700 leading-relaxed"><?= ($animal['description_habitat']) ?></p>
                         </div>
 
 

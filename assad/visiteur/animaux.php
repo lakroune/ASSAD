@@ -1,6 +1,6 @@
  <?php
     session_start();
- 
+
     include "../db_connect.php";
 
     if (
@@ -10,9 +10,9 @@
     ) {
 
 
-        $id_utilisateur = htmlspecialchars($_SESSION['id_utilisateur']);
-        $nom_utilisateur = htmlspecialchars($_SESSION['nom_utilisateur']);
-        $role_utilisateur = htmlspecialchars($_SESSION['role_utilisateur']);
+        $id_utilisateur = ($_SESSION['id_utilisateur']);
+        $nom_utilisateur = ($_SESSION['nom_utilisateur']);
+        $role_utilisateur = ($_SESSION['role_utilisateur']);
 
         $sql = " select * from  habitats ";
         $resultat = $conn->query($sql);
@@ -169,6 +169,8 @@
                              href="reservation.php">Réservation</a>
                          <a class="text-[#1b140d] text-sm font-medium hover:text-primary transition-colors"
                              href="./mes_reservations.php">Mes Reservations</a>
+                         <a class="text-[#1b140d] text-sm font-medium hover:text-primary transition-colors"
+                             href="./../php/sedeconnecter.php"> Se Deconnecter</a>
                      </div>
 
                  </div>
@@ -210,7 +212,7 @@
                              class="px-4 py-2 bg-white border border-[#e5e5e5] hover:border-primary/50 hover:bg-primary/5 text-[#1b140d] rounded-lg text-sm font-medium whitespace-nowrap transition-all focus:ring-primary focus:border-primary w-full sm:w-1/2">
                              <option value="">Filtrer par Habitat</option>
                              <?php foreach ($array_habitats as $habitat) : ?>
-                                 <option value="<?= htmlspecialchars($habitat["id_habitat"]) ?>"><?= htmlspecialchars($habitat["nom_habitat"]) ?></option>
+                                 <option value="<?= ($habitat["id_habitat"]) ?>"><?= ($habitat["nom_habitat"]) ?></option>
                              <?php endforeach; ?>
                          </select>
                          <select name="alimentation_animal"
@@ -248,29 +250,29 @@
                         }
                         ?>
 
-                     <?php if ($index === 0 && strtolower(trim($animal["nom_animal"])) ==  strtolower("Lion d'Atlas")) :
+                     <?php if (strtolower(trim($animal["espece"])) ==  trim(strtolower("Lion d'Atlas"))) :
                         ?>
                          <div class="group  relative flex flex-col bg-white rounded-2xl border-2 border-primary overflow-hidden hover:shadow-xl transition-all duration-300 col-span-1 sm:col-span-2 lg:col-span-2">
                              <div class="absolute top-4 left-4 z-10">
                                  <span class="inline-flex items-center gap-1 px-3 py-1.5 rounded-lg bg-primary text-white text-xs font-bold shadow-lg">
                                      <span class="material-symbols-outlined text-[16px]">stars</span>
-                                     <?= htmlspecialchars($animal['alimentation_animal']) ?>
+                                     <?= ($animal['alimentation_animal']) ?>
                                  </span>
                              </div>
-                             <a href="animal_detail.php?id=<?= htmlspecialchars($animal['id_animal']) ?>" class="h-64 md:h-full w-full overflow-hidden relative">
-                                 <img alt="<?= htmlspecialchars($animal['nom_animal']) ?>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="<?= htmlspecialchars($animal['image_url']) ?>" />
+                             <a href="animal_detail.php?id=<?= ($animal['id_animal']) ?>" class="h-64 md:h-full w-full overflow-hidden relative">
+                                 <img alt="<?= ($animal['nom_animal']) ?>" class="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500" src="<?= ($animal['image_url']) ?>" />
                                  <div class="absolute inset-0 bg-gradient-to-t from-black/70 via-transparent to-transparent"></div>
                                  <div class="absolute bottom-4 left-4 text-white">
-                                     <h3 class="text-2xl font-bold"><?= htmlspecialchars($animal['nom_animal']) ?></h3>
-                                     <p class="text-white/80 text-sm"><?= htmlspecialchars($animal['espece']) ?></p>
+                                     <h3 class="text-2xl font-bold"><?= ($animal['nom_animal']) ?></h3>
+                                     <p class="text-white/80 text-sm"><?= ($animal['espece']) ?></p>
                                  </div>
                              </a>
                              <div class="p-4 flex justify-between items-center bg-primary/5 border-t border-primary/10">
                                  <div class="flex items-center gap-2 text-sm font-medium text-[#1b140d]">
                                      <span class="w-5 h-5 rounded-full overflow-hidden flex items-center justify-center bg-gray-200 text-xs">🇲🇦</span>
-                                     <?= htmlspecialchars($animal['pays_origine']) ?>
+                                     <?= ($animal['pays_origine']) ?>
                                  </div>
-                                 <a href="animal_detail.php?id=<?= htmlspecialchars($animal['id_animal']) ?>" class="text-primary text-sm font-bold flex items-center gap-1 group-hover:gap-2 transition-all">
+                                 <a href="animal_detail.php?id=<?= ($animal['id_animal']) ?>" class="text-primary text-sm font-bold flex items-center gap-1 group-hover:gap-2 transition-all">
                                      En savoir plus
                                      <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
                                  </a>
@@ -279,33 +281,33 @@
                      <?php else : // Cartes régulières 
                         ?>
                          <div class="group flex flex-col bg-white rounded-2xl border border-[#f3ede7] overflow-hidden hover:shadow-lg transition-all duration-300 hover:-translate-y-1">
-                             <a href="animal_detail.php?id=<?= htmlspecialchars($animal['id_animal']) ?>" class="h-48 overflow-hidden relative">
-                                 <img alt="<?= htmlspecialchars($animal['nom_animal']) ?>" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="<?= htmlspecialchars($animal['image_url']) ?>" />
+                             <a href="animal_detail.php?id=<?= ($animal['id_animal']) ?>" class="h-48 overflow-hidden relative">
+                                 <img alt="<?= ($animal['nom_animal']) ?>" class="w-full h-full object-cover group-hover:scale-110 transition-transform duration-500" src="<?= ($animal['image_url']) ?>" />
 
                              </a>
                              <div class="p-4 flex flex-col flex-grow">
                                  <div class="flex items-start justify-between mb-2">
                                      <div>
-                                         <h3 class="text-lg font-bold text-[#1b140d]"><?= htmlspecialchars($animal['nom_animal']) ?></h3>
-                                         <p class="text-xs text-gray-500 italic"><?= htmlspecialchars($animal['espece']) ?></p>
+                                         <h3 class="text-lg font-bold text-[#1b140d]"><?= ($animal['nom_animal']) ?></h3>
+                                         <p class="text-xs text-gray-500 italic"><?= ($animal['espece']) ?></p>
                                      </div>
                                  </div>
                                  <div class="flex flex-wrap gap-2 mt-2">
                                      <span class="inline-flex items-center px-2 py-1 rounded bg-[#f8f7f6] text-xs font-medium text-gray-600">
-                                         <?= htmlspecialchars($animal['nom_habitat']) ?>
+                                         <?= ($animal['nom_habitat']) ?>
                                      </span>
                                      <?php if ($badge_class): ?>
                                          <span class="inline-flex items-center px-2 py-1 rounded text-xs font-medium <?= $badge_class ?>">
-                                             <?= htmlspecialchars($animal['alimentation_animal']) ?>
+                                             <?= ($animal['alimentation_animal']) ?>
                                          </span>
                                      <?php endif; ?>
                                  </div>
                                  <div class="mt-auto pt-4 flex items-center justify-between border-t border-gray-100">
                                      <div class="flex items-center gap-1.5 text-xs font-medium text-gray-600">
                                          <span class="material-symbols-outlined text-[16px] text-gray-400">location_on</span>
-                                         <?= htmlspecialchars($animal['pays_origine']) ?>
+                                         <?= ($animal['pays_origine']) ?>
                                      </div>
-                                     <a href="animal_detail.php?id=<?= htmlspecialchars($animal['id_animal']) ?>" class="text-primary text-sm font-bold flex items-center gap-1 group-hover:gap-2 transition-all">
+                                     <a href="animal_detail.php?id=<?= ($animal['id_animal']) ?>" class="text-primary text-sm font-bold flex items-center gap-1 group-hover:gap-2 transition-all">
                                          Détails
                                          <span class="material-symbols-outlined text-[18px]">arrow_forward</span>
                                      </a>

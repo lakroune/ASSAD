@@ -7,16 +7,16 @@
         $_SESSION['role_utilisateur'] === "admin" &&
         $_SESSION['logged_in'] === TRUE
     ) {
-        $id_utilisateur = htmlspecialchars($_SESSION['id_utilisateur']);
-        $nom_utilisateur = htmlspecialchars($_SESSION['nom_utilisateur']);
-        $role_utilisateur = htmlspecialchars($_SESSION['role_utilisateur']);
+        $id_utilisateur = ($_SESSION['id_utilisateur']);
+        $nom_utilisateur = ($_SESSION['nom_utilisateur']);
+        $role_utilisateur = ($_SESSION['role_utilisateur']);
 
 
 
         $sql = " SELECT  *  FROM habitats where nom_habitat like  ?";
         $searchInput = "%";
         if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['searchInput']))
-            $searchInput =  htmlspecialchars($_POST["searchInput"]) . "%";
+            $searchInput =  ($_POST["searchInput"]) . "%";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $searchInput);
         $stmt->execute();
@@ -242,16 +242,16 @@
                                              <div class="flex items-center gap-3">
                                                  <span class="material-symbols-outlined text-2xl text-primary"><?php  ?></span>
                                                  <div class="flex flex-col">
-                                                     <span class="font-bold text-text-light dark:text-text-dark"><?= htmlspecialchars($habitat['nom_habitat']) ?></span>
-                                                     <span class="text-xs text-text-secondary-light">ID: <?= htmlspecialchars($habitat['id_habitat']) ?></span>
+                                                     <span class="font-bold text-text-light dark:text-text-dark"><?= ($habitat['nom_habitat']) ?></span>
+                                                     <span class="text-xs text-text-secondary-light">ID: <?= ($habitat['id_habitat']) ?></span>
                                                  </div>
                                              </div>
                                          </td>
                                          <td class="px-6 py-3">
-                                             <span class="text-text-light dark:text-text-dark font-medium"><?= htmlspecialchars($habitat['type_climat']) ?></span>
+                                             <span class="text-text-light dark:text-text-dark font-medium"><?= ($habitat['type_climat']) ?></span>
                                          </td>
                                          <td class="px-6 py-3 text-start">
-                                             <span class="font-bold text-sm text-primary"><?= htmlspecialchars($habitat['zone_zoo']) ?></span>
+                                             <span class="font-bold text-sm text-primary"><?= ($habitat['zone_zoo']) ?></span>
                                          </td>
 
 
@@ -319,7 +319,7 @@
 
                      <div>
                          <label class="block text-sm font-medium mb-1">Nom de l'habitat</label>
-                         <input type="text" name="nom_habitat" value="<?= htmlspecialchars($info_habitat['nom_habitat']) ?>" required
+                         <input type="text" name="nom_habitat" value="<?= ($info_habitat['nom_habitat']) ?>" required
                              class="w-full rounded-lg border-gray-300 dark:bg-background-dark dark:border-gray-700 focus:ring-blue-500 text-sm">
                      </div>
 
@@ -336,14 +336,14 @@
 
                      <div>
                          <label class="block text-sm font-medium mb-1">Zone du Zoo</label>
-                         <input type="text" name="zone_zoo" value="<?= htmlspecialchars($info_habitat['zone_zoo']) ?>" required
+                         <input type="text" name="zone_zoo" value="<?= ($info_habitat['zone_zoo']) ?>" required
                              class="w-full rounded-lg border-gray-300 dark:bg-background-dark dark:border-gray-700 focus:ring-blue-500 text-sm">
                      </div>
 
                      <div>
                          <label class="block text-sm font-medium mb-1">Description</label>
                          <textarea name="description_habitat" rows="4" required
-                             class="w-full rounded-lg border-gray-300 dark:bg-background-dark dark:border-gray-700 focus:ring-blue-500 text-sm"><?= htmlspecialchars($info_habitat['description_habitat']) ?></textarea>
+                             class="w-full rounded-lg border-gray-300 dark:bg-background-dark dark:border-gray-700 focus:ring-blue-500 text-sm"><?= ($info_habitat['description_habitat']) ?></textarea>
                      </div>
 
                      <div class="mt-2 flex gap-3">
@@ -420,7 +420,7 @@
                  <div class="flex justify-between items-start mb-6">
                      <div>
                          <p class="text-primary font-bold text-xs uppercase tracking-widest">Détails de l'habitat</p>
-                         <h2 class="text-3xl font-black"><?= htmlspecialchars($info_habitat['nom_habitat']) ?></h2>
+                         <h2 class="text-3xl font-black"><?= ($info_habitat['nom_habitat']) ?></h2>
                      </div>
                      <button onclick="closeInfoModal()" class="bg-gray-100 dark:bg-gray-800 p-2 rounded-full hover:text-red-500 transition-colors">
                          <span class="material-symbols-outlined">close</span>
@@ -429,17 +429,17 @@
                  <div class="grid grid-cols-2 gap-4 mb-6">
                      <div class="p-4 bg-gray-50 dark:bg-background-dark rounded-xl">
                          <p class="text-xs text-text-secondary-light">Climat</p>
-                         <p class="font-bold"><?= htmlspecialchars($info_habitat['type_climat']) ?></p>
+                         <p class="font-bold"><?= ($info_habitat['type_climat']) ?></p>
                      </div>
                      <div class="p-4 bg-gray-50 dark:bg-background-dark rounded-xl">
                          <p class="text-xs text-text-secondary-light">Zone géographique</p>
-                         <p class="font-bold"><?= htmlspecialchars($info_habitat['zone_zoo']) ?></p>
+                         <p class="font-bold"><?= ($info_habitat['zone_zoo']) ?></p>
                      </div>
                  </div>
                  <div class="mb-8">
                      <p class="text-xs text-text-secondary-light mb-2">Description complète</p>
                      <p class="text-sm leading-relaxed italic text-text-secondary-dark">
-                         "<?= nl2br(htmlspecialchars($info_habitat['description_habitat'])) ?>"
+                         "<?= nl2br(($info_habitat['description_habitat'])) ?>"
                      </p>
                  </div>
                  <button onclick="closeInfoModal()" class="w-full py-3 bg-primary text-white font-bold rounded-xl">Fermer</button>

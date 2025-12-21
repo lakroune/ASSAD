@@ -1,20 +1,20 @@
  <?php
 
     $image = "https://lh3.googleusercontent.com/aida-public/AB6AXuBB3mzttMFekKaHiUMQgz9CbcCvR-LHMfkNamiYLEoaa6mr4VX3RGazcvrLyN6USTeeR3THkb5RzRgunm2nxYGRlj0JP37XKsb0oTpMuUfgiqYzKIQpDFu5Cwamtq0rGjsH93RIdsA6guKSg4KakhrlAV6mKU_SZGX00TM6y3-uGVugQHONmrBvFsVLmZ73htnyBEHRcaZXZ-cwzOoPb7aiKe-dIsmCV4By1n5q6PJKo8CSmh3GTGb2hDjnxSb8_vhCsJz-sArwzoL6";
-    
+
     session_start();
- 
+
     include "../db_connect.php";
-  if (
+    if (
         isset($_SESSION['role_utilisateur'], $_SESSION['logged_in'], $_SESSION['id_utilisateur']) &&
         $_SESSION['role_utilisateur'] === "visiteur" &&
         $_SESSION['logged_in'] === TRUE
     ) {
 
 
-        $id_utilisateur = htmlspecialchars($_SESSION['id_utilisateur']);
-        $nom_utilisateur = htmlspecialchars($_SESSION['nom_utilisateur']);
-        $role_utilisateur = htmlspecialchars($_SESSION['role_utilisateur']);
+        $id_utilisateur = ($_SESSION['id_utilisateur']);
+        $nom_utilisateur = ($_SESSION['nom_utilisateur']);
+        $role_utilisateur = ($_SESSION['role_utilisateur']);
         $tour_id = $_GET['id'];
 
         $sql = " select * from  visitesguidees  inner join  utilisateurs  on id_utilisateur =  id_guide and id_visite = $tour_id";
@@ -56,7 +56,7 @@
  <head>
      <meta charset="utf-8" />
      <meta content="width=device-width, initial-scale=1.0" name="viewport" />
-     <title>Détails : <?= htmlspecialchars($tour['title']) ?> - ASSAD</title>
+     <title>Détails : <?= ($tour['title']) ?> - ASSAD</title>
      <link href="https://fonts.googleapis.com" rel="preconnect" />
      <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect" />
      <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;700;800&display=swap" rel="stylesheet" />
@@ -129,7 +129,9 @@
                          <a class="text-primary text-sm font-bold hover:text-primary transition-colors"
                              href="reservation.php">Réservation</a>
                          <a class="text-[#1b140d] text-sm font-medium hover:text-primary transition-colors"
-                             href="#">CAN 2025</a>
+                             href="./mes_reservations.php">Mes Reservations</a>
+                         <a class="text-[#1b140d] text-sm font-medium hover:text-primary transition-colors"
+                             href="./../php/sedeconnecter.php"> Se Deconnecter</a>
                      </div>
 
                  </div>
@@ -150,12 +152,12 @@
              <div class="p-6 md:p-10 max-w-7xl mx-auto w-full flex flex-col gap-8">
                  <a href="./reservation.php" class="text-sm text-text-sec-light dark:text-text-sec-dark hover:text-primary transition-colors flex items-center gap-1">
                      <span class="material-symbols-outlined text-[18px]">arrow_back</span>
-                     Retour à les  Visites
+                     Retour à les Visites
                  </a>
 
                  <div class="flex flex-wrap justify-between items-start gap-4 pb-4 border-b border-border-light dark:border-border-dark">
                      <div class="flex flex-col gap-1">
-                         <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight"><?= htmlspecialchars($tour['titre_visite']) ?></h2>
+                         <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight"><?= ($tour['titre_visite']) ?></h2>
                          <p class="text-text-sec-light dark:text-text-sec-dark text-lg">Détails de Visite #<?= $tour_id ?></p>
                      </div>
 
@@ -165,11 +167,34 @@
                  <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
                      <div class="lg:col-span-1 flex flex-col gap-6">
-
+                         <?php
+                            $date_visite = strtotime($visit['dateheure_viste']?? time());
+                            $maintenant = time();
+                            $is_full = 11 <= 0;
+                            ?>
                          <div class="h-60 rounded-xl bg-cover bg-center relative shadow-lg border border-border-light dark:border-border-dark" style='background-image: url("<?= $image ?>");'>
-                             <div class="m-3 absolute top-0 left-0 inline-flex px-3 py-1 bg-blue-600/90 backdrop-blur-sm text-white text-sm font-bold rounded-lg items-center gap-1">
+                             <div class="m-3 absolute top-0 left-0 inline-flex px-3 py-1  backdrop-blur-sm text-white text-sm font-bold rounded-lg items-center gap-1">
                                  <span class="material-symbols-outlined text-[14px] leading-none">schedule</span>
-                                 <?= $tour['statut__visite'] ?>
+                                 <div class="h-48 sm:h-auto sm:w-48 rounded-xl bg-cover bg-center shrink-0 relative bg-gray-200"
+                                     style="background-image: url('../assets/img/habitats/<?= $visit['id_habitat'] ?? 'default' ?>.jpg');">
+
+                                     <?php if ($date_visite <= $maintenant && $date_visite > ($maintenant - 3600)) : ?>
+                                         <div class="m-2 absolute top-0 left-0 inline-flex px-2 py-1 bg-green-500/90 backdrop-blur-sm text-white text-xs font-bold rounded-lg items-center gap-1">
+                                             <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span>
+                                             En direct
+                                         </div>
+                                     <?php elseif ($date_visite > $maintenant) : ?>
+                                         <div class="m-2 absolute top-0 left-0 inline-flex px-2 py-1 bg-blue-600/90 backdrop-blur-sm text-white text-xs font-bold rounded-lg items-center gap-1">
+                                             <span class="material-symbols-outlined text-[14px] leading-none">schedule</span>
+                                             Programmé
+                                         </div>
+                                     <?php else : ?>
+                                         <div class="m-2 absolute top-0 left-0 inline-flex px-2 py-1 bg-gray-500/90 backdrop-blur-sm text-white text-xs font-bold rounded-lg items-center gap-1">
+                                             Terminé
+                                         </div>
+                                     <?php endif; ?>
+                                 </div>
+
                              </div>
                          </div>
 
@@ -203,7 +228,7 @@
                                  <span class="material-symbols-outlined text-primary">description</span>
                                  Description
                              </h3>
-                             <p class="text-sm text-text-main-light/90 dark:text-text-main-dark/90"><?= (htmlspecialchars($tour['description_visite'])) ?></p>
+                             <p class="text-sm text-text-main-light/90 dark:text-text-main-dark/90"><?= (($tour['description_visite'])) ?></p>
                          </div>
                      </div>
 
@@ -256,11 +281,11 @@
                                      <?php foreach ($array_etapes as $etape) : ?>
                                          <tr class="hover:bg-background-light dark:hover:bg-white/5 transition-colors">
                                              <td class="px-6 py-4 whitespace-nowrap">
-                                                 <div class="text-sm font-medium text-text-main-light dark:text-text-main-dark"><?= htmlspecialchars($etape['titre_etape']) ?></div>
-                                                 <div class="text-xs text-text-sec-light dark:text-text-sec-dark truncate"><?= htmlspecialchars($etape['description_etape']) ?></div>
+                                                 <div class="text-sm font-medium text-text-main-light dark:text-text-main-dark"><?= ($etape['titre_etape']) ?></div>
+                                                 <div class="text-xs text-text-sec-light dark:text-text-sec-dark truncate"><?= ($etape['description_etape']) ?></div>
                                              </td>
                                              <td class="px-6 py-4 whitespace-nowrap text-center">
-                                                 <span class="text-sm font-bold"><?= htmlspecialchars($etape['description_etape']) ?></span>
+                                                 <span class="text-sm font-bold"><?= ($etape['description_etape']) ?></span>
                                              </td>
 
                                              <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
@@ -276,9 +301,9 @@
                                  </tbody>
                              </table>
 
-                             <?php if (empty($participants)): ?>
+                             <?php if (empty($array_etapes)): ?>
                                  <div class="p-6 text-center text-text-sec-light dark:text-text-sec-dark text-sm">
-                                     Aucun participant pour cette visite pour l'instant.
+                                     Aucun étapes pour cette visite pour l'instant.
                                  </div>
                              <?php endif; ?>
 

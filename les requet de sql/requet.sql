@@ -195,7 +195,7 @@ INSERT INTO
 VALUES (
         'Safari Nocturne',
         'Découvrez les prédateurs la nuit.',
-        '2025-06-15 20:00:00',
+        '2026-06-15 20:00:00',
         'Français',
         15,
         '02:00:00',

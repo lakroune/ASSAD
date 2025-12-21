@@ -8,9 +8,9 @@ if (
     $_SESSION['role_utilisateur'] === "guide" &&
     $_SESSION['logged_in'] === TRUE
 ) {
-    $id_utilisateur = htmlspecialchars($_SESSION['id_utilisateur']);
-    $nom_utilisateur = htmlspecialchars($_SESSION['nom_utilisateur']);
-    $role_utilisateur = htmlspecialchars($_SESSION['id_utilisateur']);
+    $id_utilisateur = ($_SESSION['id_utilisateur']);
+    $nom_utilisateur = ($_SESSION['nom_utilisateur']);
+    $role_utilisateur = ($_SESSION['id_utilisateur']);
 
 
 
@@ -139,7 +139,7 @@ if (
                             <div class="flex flex-col justify-between flex-1 gap-2">
                                 <div>
                                     <div class="flex justify-between">
-                                        <h4 class="text-xl font-bold text-primary"><?= htmlspecialchars($tour['titre_visite']) ?></h4>
+                                        <h4 class="text-xl font-bold text-primary"><?= ($tour['titre_visite']) ?></h4>
                                         <?php
                                         if ($tour['statut__visite'] == 0)
 
@@ -150,7 +150,7 @@ if (
                                         ?>
 
                                     </div>
-                                    <p class="text-sm line-clamp-2 mt-1"><?= htmlspecialchars($tour['description_visite']) ?></p>
+                                    <p class="text-sm line-clamp-2 mt-1"><?= ($tour['description_visite']) ?></p>
 
                                     <div class="flex flex-wrap gap-4 mt-3 text-xs font-medium text-text-sec-light dark:text-text-sec-dark">
                                         <div class="flex items-center gap-1">

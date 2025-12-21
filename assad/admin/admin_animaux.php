@@ -7,9 +7,9 @@
         $_SESSION['role_utilisateur'] === "admin" &&
         $_SESSION['logged_in'] === TRUE
     ) {
-        $id_utilisateur = htmlspecialchars($_SESSION['id_utilisateur']);
-        $nom_utilisateur = htmlspecialchars($_SESSION['nom_utilisateur']);
-        $role_utilisateur = htmlspecialchars($_SESSION['role_utilisateur']);
+        $id_utilisateur = ($_SESSION['id_utilisateur']);
+        $nom_utilisateur = ($_SESSION['nom_utilisateur']);
+        $role_utilisateur = ($_SESSION['role_utilisateur']);
 
 
 
@@ -17,7 +17,7 @@
         $sql = "  select * from  animaux a inner join  habitats h on a.id_habitat =h.id_habitat where nom_animal like  ?";
         $searchInput = "%";
         if ($_SERVER["REQUEST_METHOD"] == "POST" && isset($_POST['searchInput']))
-            $searchInput =  htmlspecialchars($_POST["searchInput"]) . "%";
+            $searchInput =  ($_POST["searchInput"]) . "%";
         $stmt = $conn->prepare($sql);
         $stmt->bind_param("s", $searchInput);
         $stmt->execute();
@@ -246,17 +246,17 @@
                                          <td class="px-6 py-3">
                                              <div class="flex items-center gap-3">
                                                  <div class="h-10 w-10 rounded-lg overflow-hidden bg-gray-100 shrink-0">
-                                                     <img alt="<?= htmlspecialchars($animal['nom_animal']) ?>" class="h-full w-full object-cover"
-                                                         src="<?= htmlspecialchars($animal['image_url']) ?>" />
+                                                     <img alt="<?= ($animal['nom_animal']) ?>" class="h-full w-full object-cover"
+                                                         src="<?= ($animal['image_url']) ?>" />
                                                  </div>
                                                  <div class="flex flex-col">
-                                                     <span class="font-bold text-text-light dark:text-text-dark"><?= htmlspecialchars($animal['nom_animal']) ?></span>
-                                                     <span class="text-xs text-text-secondary-light">ID: <?= htmlspecialchars($animal['id_animal']) ?></span>
+                                                     <span class="font-bold text-text-light dark:text-text-dark"><?= ($animal['nom_animal']) ?></span>
+                                                     <span class="text-xs text-text-secondary-light">ID: <?= ($animal['id_animal']) ?></span>
                                                  </div>
                                              </div>
                                          </td>
                                          <td class="px-6 py-3">
-                                             <span class="text-text-light dark:text-text-dark font-medium"><?= htmlspecialchars($animal['espece']) ?></span>
+                                             <span class="text-text-light dark:text-text-dark font-medium"><?=  ($animal['espece']) ?></span>
                                          </td>
                                          <td class="px-6 py-3">
                                              <span class='inline-flex items-center gap-1 text-xs font-medium text-green-700 bg-green-50 dark:text-green-300 dark:bg-green-900/20 px-2 py-1 rounded-full border border-green-100 dark:border-green-800'>
@@ -265,7 +265,7 @@
                                              </span>
                                          </td>
                                          <td class="px-6 py-3">
-                                             <?= htmlspecialchars($animal['alimentation_animal']) ?>
+                                             <?=  ($animal['alimentation_animal']) ?>
                                          </td>
                                          <td class="px-6 py-3 text-right">
                                              <div
@@ -324,101 +324,123 @@
          </div>
      </main>
 
-     <?php if ($info): ?>
-         <div id="modalInfoHabitat" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
+     <?php if ($info && $info_animal): ?>
+         <div id="modalInfoAnimal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
              <div class="bg-surface-light dark:bg-surface-dark w-full max-w-lg p-8 rounded-2xl shadow-2xl border border-primary/20">
                  <div class="flex justify-between items-start mb-6">
-
-                     <div class="h-20 w-20 rounded-full bg-gradient-to-tr from-primary to-orange-300 flex items-center justify-center text-white text-3xl font-bold shadow-lg " style="background-image: url(' <?= $info_animal['image_url'] ?>'); background_size:cover; ">
-
+                     <div class="h-20 w-20 rounded-full shadow-lg border-2 border-primary"
+                         style="background-image: url('<?= ($info_animal['image_url']) ?>'); background-size: cover; background-position: center;">
                      </div>
-                     <div>
-                         <p class="text-primary font-bold text-xs uppercase tracking-widest">Détails de l'animal</p>
-                         <h2 class="text-3xl font-black"><?= htmlspecialchars($info_animal['nom_animal']) ?></h2>
+                     <div class="flex-1 ml-4">
+                         <p class="text-primary font-bold text-xs uppercase tracking-widest">Fiche Animal</p>
+                         <h2 class="text-3xl font-black"><?= ($info_animal['nom_animal']) ?></h2>
                      </div>
-                     <button onclick="closeInfoModal()" class="bg-gray-100 dark:bg-gray-800 p-2 rounded-full hover:text-red-500 transition-colors">
+                     <button onclick="closeModal('modalInfoAnimal');" class="bg-gray-100 dark:bg-gray-800 p-2 rounded-full hover:text-red-500 transition-colors">
                          <span class="material-symbols-outlined">close</span>
                      </button>
                  </div>
+
                  <div class="grid grid-cols-2 gap-4 mb-6">
-                     <div class="p-4 bg-gray-50 dark:bg-background-dark rounded-xl">
-                         <p class="text-xs text-text-secondary-light">espece</p>
-                         <p class="font-bold"><?= htmlspecialchars($info_animal['espece']) ?></p>
+                     <div class="p-3 bg-gray-50 dark:bg-background-dark rounded-xl">
+                         <p class="text-xs text-text-secondary-light">Espèce</p>
+                         <p class="font-bold"><?= ($info_animal['espece']) ?></p>
                      </div>
-                     <div class="p-4 bg-gray-50 dark:bg-background-dark rounded-xl">
-                         <p class="text-xs text-text-secondary-light">Type d'alimentation</p>
-                         <p class="font-bold"><?= htmlspecialchars($info_animal['alimentation_animal']) ?></p>
+                     <div class="p-3 bg-gray-50 dark:bg-background-dark rounded-xl">
+                         <p class="text-xs text-text-secondary-light">Alimentation</p>
+                         <p class="font-bold"><?= ($info_animal['alimentation_animal']) ?></p>
+                     </div>
+                     <div class="p-3 bg-gray-50 dark:bg-background-dark rounded-xl">
+                         <p class="text-xs text-text-secondary-light">Pays d'Origine</p>
+                         <p class="font-bold"><?= ($info_animal['pays_origine']) ?></p>
+                     </div>
+                     <div class="p-3 bg-gray-50 dark:bg-background-dark rounded-xl">
+                         <p class="text-xs text-text-secondary-light">Habitat Actuel</p>
+                         <p class="font-bold"><?= ($info_animal['nom_habitat']) ?></p>
                      </div>
                  </div>
-                 <div class="grid grid-cols-2 gap-4 mb-6">
-                     <div class="p-4 bg-gray-50 dark:bg-background-dark rounded-xl">
-                         <p class="text-xs text-text-secondary-light">Pays Origine</p>
-                         <p class="font-bold"><?= htmlspecialchars($info_animal['pays_origine']) ?></p>
-                     </div>
-                     <div class="p-4 bg-gray-50 dark:bg-background-dark rounded-xl">
-                         <p class="text-xs text-text-secondary-light">Type d'alimentation</p>
-                         <p class="font-bold"><?= htmlspecialchars($info_animal['nom_habitat']) ?></p>
-                     </div>
-                 </div>
+
                  <div class="mb-8">
-                     <p class="text-xs text-text-secondary-light mb-2">Description complète</p>
-                     <p class="text-sm leading-relaxed italic text-text-secondary-dark">
-                         "<?= nl2br(htmlspecialchars($info_animal['description_animal'])) ?>"
+                     <p class="text-xs text-text-secondary-light mb-2">Description</p>
+                     <p class="text-sm leading-relaxed italic text-text-secondary-dark bg-gray-50 dark:bg-background-dark p-4 rounded-lg">
+                         "<?= nl2br(($info_animal['description_animal'])) ?>"
                      </p>
                  </div>
-                 <button onclick="closeInfoModal()" class="w-full py-3 bg-primary text-white font-bold rounded-xl">Fermer</button>
+                 <button onclick="closeModal('modalInfoAnimal')" class="w-full py-3 bg-primary text-white font-bold rounded-xl hover:bg-primary-dark transition-colors">Fermer</button>
              </div>
          </div>
      <?php endif; ?>
 
      <?php if ($edit && $info_animal): ?>
-         <div id="modalEditHabitat" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm">
-             <div class="bg-surface-light dark:bg-surface-dark w-full max-w-md p-6 rounded-xl shadow-2xl border border-blue-500/30">
-                 <div class="flex justify-between items-center mb-6">
-                     <h2 class="text-xl font-bold text-blue-600">Modifier l'Habitat</h2>
-                     <button onclick="document.getElementById('modalEditHabitat').remove()" class="text-gray-500 hover:text-red-500">
+         <div id="modalEditAnimal" class="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+             <div class="bg-surface-light dark:bg-surface-dark w-full max-w-md max-h-[90vh] overflow-y-auto p-6 rounded-xl shadow-2xl border border-blue-500/30">
+
+                 <div class="flex justify-between items-center mb-6 sticky top-0 bg-surface-light dark:bg-surface-dark py-2 z-10 border-b dark:border-gray-700">
+                     <h2 class="text-xl font-bold text-blue-600">Modifier l'Animal</h2>
+                     <button onclick="window.location.href='admin_animaux.php'" class="text-gray-500 hover:text-red-500">
                          <span class="material-symbols-outlined">close</span>
                      </button>
                  </div>
 
-                 <form action="php/update_habitat.php" method="POST" class="flex flex-col gap-4">
-                     <input type="hidden" name="id_habitat" value="<?= $info_animal['id_habitat'] ?>">
+                 <form action="php/update_animal.php" method="POST" class="flex flex-col gap-4">
+                     <input type="hidden" name="id_animal" value="<?= $info_animal['id_animal'] ?>">
 
                      <div>
-                         <label class="block text-sm font-medium mb-1">Nom de l'habitat</label>
-                         <input type="text" name="nom_habitat" value="<?= htmlspecialchars($info_animal['nom_habitat']) ?>" required
+                         <label class="block text-sm font-medium mb-1">Nom de l'animal</label>
+                         <input type="text" name="nom_animal" value="<?= ($info_animal['nom_animal']) ?>" required
+                             class="w-full rounded-lg border-gray-300 dark:bg-background-dark dark:border-gray-700 focus:ring-blue-500 text-sm">
+                     </div>
+
+                     <div class="grid grid-cols-2 gap-4">
+                         <div>
+                             <label class="block text-sm font-medium mb-1">Espèce</label>
+                             <input type="text" name="espece" value="<?= ($info_animal['espece']) ?>" required
+                                 class="w-full rounded-lg border-gray-300 dark:bg-background-dark dark:border-gray-700 focus:ring-blue-500 text-sm">
+                         </div>
+                         <div>
+                             <label class="block text-sm font-medium mb-1">Alimentation</label>
+                             <select name="alimentation_animal" class="w-full rounded-lg border-gray-300 dark:bg-background-dark dark:border-gray-700 text-sm">
+                                 <option value="Carnivore" <?= $info_animal['alimentation_animal'] == 'Carnivore' ? 'selected' : '' ?>>Carnivore</option>
+                                 <option value="herbivore" <?= $info_animal['alimentation_animal'] == 'herbivore' ? 'selected' : '' ?>>Herbivore</option>
+                                 <option value="omnivore" <?= $info_animal['alimentation_animal'] == 'omnivore' ? 'selected' : '' ?>>Omnivore</option>
+                             </select>
+                         </div>
+                     </div>
+
+                     <div>
+                         <label class="block text-sm font-medium mb-1">Pays d'origine</label>
+                         <input type="text" name="pays_origine" value="<?= ($info_animal['pays_origine']) ?>" required
                              class="w-full rounded-lg border-gray-300 dark:bg-background-dark dark:border-gray-700 focus:ring-blue-500 text-sm">
                      </div>
 
                      <div>
-                         <label class="block text-sm font-medium mb-1">Type de Climat</label>
-                         <select name="type_climat" required class="w-full rounded-lg border-gray-300 dark:bg-background-dark dark:border-gray-700 focus:ring-blue-500 text-sm">
+                         <label class="block text-sm font-medium mb-1">URL de l'image</label>
+                         <input type="url" name="image_url" value="<?= ($info_animal['image_url']) ?>" required
+                             class="w-full rounded-lg border-gray-300 dark:bg-background-dark dark:border-gray-700 focus:ring-blue-500 text-sm">
+                     </div>
+
+                     <div>
+                         <label class="block text-sm font-medium mb-1">Habitat</label>
+                         <select name="id_habitat" required class="w-full rounded-lg border-gray-300 dark:bg-background-dark dark:border-gray-700 text-sm">
                              <?php
-                                $climats = ["Tropical", "Aride", "Tempéré", "Polaire", "Aquatique", "Savane"];
-                                foreach ($climats as $c): ?>
-                                 <option value="<?= $c ?>" <?= ($info_animal['type_climat'] == $c) ? 'selected' : '' ?>><?= $c ?></option>
-                             <?php endforeach; ?>
+                                $res_h = $conn->query("SELECT id_habitat, nom_habitat FROM habitats");
+                                while ($h = $res_h->fetch_assoc()): ?>
+                                 <option value="<?= $h['id_habitat'] ?>" <?= ($h['id_habitat'] == $info_animal['id_habitat']) ? 'selected' : '' ?>>
+                                     <?= ($h['nom_habitat']) ?>
+                                 </option>
+                             <?php endwhile; ?>
                          </select>
                      </div>
 
                      <div>
-                         <label class="block text-sm font-medium mb-1">Zone du Zoo</label>
-                         <input type="text" name="zone_zoo" value="<?= htmlspecialchars($info_animal['zone_zoo']) ?>" required
-                             class="w-full rounded-lg border-gray-300 dark:bg-background-dark dark:border-gray-700 focus:ring-blue-500 text-sm">
-                     </div>
-
-                     <div>
                          <label class="block text-sm font-medium mb-1">Description</label>
-                         <textarea name="description_habitat" rows="4" required
-                             class="w-full rounded-lg border-gray-300 dark:bg-background-dark dark:border-gray-700 focus:ring-blue-500 text-sm"><?= htmlspecialchars($info_animal['description_habitat']) ?></textarea>
+                         <textarea name="description_animal" rows="4" required
+                             class="w-full rounded-lg border-gray-300 dark:bg-background-dark dark:border-gray-700 focus:ring-blue-500 text-sm"><?= ($info_animal['description_animal']) ?></textarea>
                      </div>
 
-                     <div class="mt-2 flex gap-3">
-                         <button type="button" onclick="document.getElementById('modalEditHabitat').remove()"
-                             class="flex-1 py-2 text-sm font-bold border border-gray-300 rounded-lg hover:bg-gray-50">Annuler</button>
-                         <button type="submit" class="flex-1 py-2 text-sm font-bold bg-blue-600 text-white rounded-lg hover:bg-blue-700 shadow-lg shadow-blue-600/20">
-                             Mettre à jour
-                         </button>
+                     <div class="mt-4 flex gap-3 sticky bottom-0 bg-surface-light dark:bg-surface-dark py-2 border-t dark:border-gray-700">
+                         <button type="button" onclick="window.location.href='admin_animaux.php'"
+                             class="flex-1 py-2 text-sm font-bold border border-gray-300 rounded-lg hover:bg-gray-50 dark:hover:bg-gray-800">Annuler</button>
+                         <button type="submit" class="flex-1 py-2 text-sm font-bold bg-blue-600 text-white rounded-lg hover:bg-blue-700">Mettre à jour</button>
                      </div>
                  </form>
              </div>
@@ -472,7 +494,7 @@
                              <?php
                                 $res_h = $conn->query("SELECT id_habitat, nom_habitat FROM habitats");
                                 while ($h = $res_h->fetch_assoc()): ?>
-                                 <option value="<?= $h['id_habitat'] ?>"><?= htmlspecialchars($h['nom_habitat']) ?></option>
+                                 <option value="<?= $h['id_habitat'] ?>"><?= ($h['nom_habitat']) ?></option>
                              <?php endwhile; ?>
                          </select>
                      </div>
@@ -523,7 +545,20 @@
              }
          });
 
+         function closeModal(modalId) {
+             const modal = document.getElementById(modalId);
+             if (modal) {
+                 modal.classList.add('hidden');
+                 modal.classList.remove('flex');
+                 modal.remove();
+             }
+         }
 
+         window.onclick = function(event) {
+             if (event.target.id.includes('modal')) {
+                 event.target.remove();
+             }
+         }
 
          function toggleModal() {
              const modal = document.getElementById('modalAnimal');

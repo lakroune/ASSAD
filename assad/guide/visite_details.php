@@ -8,9 +8,9 @@
         $_SESSION['role_utilisateur'] === "guide" &&
         $_SESSION['logged_in'] === TRUE
     ) {
-        $id_utilisateur = htmlspecialchars($_SESSION['id_utilisateur']);
-        $nom_utilisateur = htmlspecialchars($_SESSION['nom_utilisateur']);
-        $role_utilisateur = htmlspecialchars($_SESSION['id_utilisateur']);
+        $id_utilisateur = ($_SESSION['id_utilisateur']);
+        $nom_utilisateur = ($_SESSION['nom_utilisateur']);
+        $role_utilisateur = ($_SESSION['id_utilisateur']);
 
 
         $tour_id = $_GET['id'];
@@ -171,7 +171,7 @@
 
                      <div class="flex flex-wrap justify-between items-start gap-4 pb-4 border-b border-border-light dark:border-border-dark">
                          <div class="flex flex-col gap-1">
-                             <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight"><?= htmlspecialchars($tour['titre_visite']) ?></h2>
+                             <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight"><?= ($tour['titre_visite']) ?></h2>
                              <p class="text-text-sec-light dark:text-text-sec-dark text-lg">Détails de Visite #<?= $tour_id ?></p>
                          </div>
 
@@ -222,7 +222,7 @@
                                      <span class="material-symbols-outlined text-primary">description</span>
                                      Description
                                  </h3>
-                                 <p class="text-sm text-text-main-light/90 dark:text-text-main-dark/90"><?= (htmlspecialchars($tour['description_visite'])) ?></p>
+                                 <p class="text-sm text-text-main-light/90 dark:text-text-main-dark/90"><?= (($tour['description_visite'])) ?></p>
                              </div>
                          </div>
 
@@ -275,11 +275,11 @@
                                          <?php foreach ($array_etapes as $etape) : ?>
                                              <tr class="hover:bg-background-light dark:hover:bg-white/5 transition-colors">
                                                  <td class="px-6 py-4 whitespace-nowrap">
-                                                     <div class="text-sm font-medium text-text-main-light dark:text-text-main-dark"><?= htmlspecialchars($etape['titre_etape']) ?></div>
-                                                     <div class="text-xs text-text-sec-light dark:text-text-sec-dark truncate"><?= htmlspecialchars($etape['description_etape']) ?></div>
+                                                     <div class="text-sm font-medium text-text-main-light dark:text-text-main-dark"><?= ($etape['titre_etape']) ?></div>
+                                                     <div class="text-xs text-text-sec-light dark:text-text-sec-dark truncate"><?= ($etape['description_etape']) ?></div>
                                                  </td>
                                                  <td class="px-6 py-4 whitespace-nowrap text-center">
-                                                     <span class="text-sm font-bold"><?= htmlspecialchars($etape['description_etape']) ?></span>
+                                                     <span class="text-sm font-bold"><?= ($etape['description_etape']) ?></span>
                                                  </td>
 
                                                  <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">

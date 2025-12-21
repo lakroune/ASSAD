@@ -13,9 +13,9 @@ include "../db_connect.php";
 
 
 
-    $id_utilisateur = htmlspecialchars($_SESSION['id_utilisateur']);
-    $nom_utilisateur = htmlspecialchars($_SESSION['nom_utilisateur']);
-    $role_utilisateur = htmlspecialchars($_SESSION['role_utilisateur']);
+    $id_utilisateur = ($_SESSION['id_utilisateur']);
+    $nom_utilisateur = ($_SESSION['nom_utilisateur']);
+    $role_utilisateur = ($_SESSION['role_utilisateur']);
 
 
     $sql = " select * from  animaux order by rand() limit 2";
@@ -95,8 +95,10 @@ include "../db_connect.php";
                             href="animaux.php">Animaux</a>
                         <a class="text-[#1b140d] text-sm font-medium hover:text-primary transition-colors"
                             href="reservation.php">Réservation</a>
-                        <a class="text-[#1b140d] text-sm font-medium hover:text-primary transition-colors"
-                            href="./mes_reservations.php">mes reservations</a>
+                         <a class="text-[#1b140d] text-sm font-medium hover:text-primary transition-colors"
+                             href="./mes_reservations.php">Mes Reservations</a>
+                         <a class="text-[#1b140d] text-sm font-medium hover:text-primary transition-colors"
+                             href="./../php/sedeconnecter.php"> Se Deconnecter</a>
                     </div>
 
                 </div>
@@ -144,12 +146,12 @@ include "../db_connect.php";
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
                 <?php foreach ($array_animaux as $animal) : ?>
                     <div class="bg-white rounded-xl overflow-hidden shadow-lg group flex items-center border border-[#f3ede7]">
-                        <img src="<?= htmlspecialchars($animal['image_url']) ?>" alt="<?= htmlspecialchars($animal['nom_animal']) ?>"
+                        <img src="<?= ($animal['image_url']) ?>" alt="<?= ($animal['nom_animal']) ?>"
                             class="w-32 h-32 object-cover shrink-0 group-hover:scale-105 transition-transform duration-300" />
                         <div class="p-4 flex-grow">
-                            <h3 class="text-xl font-bold text-[#1b140d]"><?= htmlspecialchars($animal['nom_animal']) ?></h3>
+                            <h3 class="text-xl font-bold text-[#1b140d]"><?= ($animal['nom_animal']) ?></h3>
                             <p class="text-gray-500 text-sm mb-3">Découvrez son habitat et son statut de conservation.</p>
-                            <a href="animal_detail.php?id=<?= htmlspecialchars($animal['id_animal']) ?>" class="text-primary text-sm font-bold hover:underline">
+                            <a href="animal_detail.php?id=<?= ($animal['id_animal']) ?>" class="text-primary text-sm font-bold hover:underline">
                                 Voir la fiche complète &rarr;
                             </a>
                         </div>

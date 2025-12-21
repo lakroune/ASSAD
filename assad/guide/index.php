@@ -8,9 +8,9 @@ if (
     $_SESSION['role_utilisateur'] === "guide" &&
     $_SESSION['logged_in'] === TRUE
 ) {
-    $id_utilisateur = htmlspecialchars($_SESSION['id_utilisateur']);
-    $nom_utilisateur = htmlspecialchars($_SESSION['nom_utilisateur']);
-    $role_utilisateur = htmlspecialchars($_SESSION['id_utilisateur']);
+    $id_utilisateur = ($_SESSION['id_utilisateur']);
+    $nom_utilisateur = ($_SESSION['nom_utilisateur']);
+    $role_utilisateur = ($_SESSION['id_utilisateur']);
 
 
 
