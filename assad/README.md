@@ -45,11 +45,5 @@ Le projet s'appuie sur les tables suivantes :
 
 ---
 
-##  Bonus Implémentés
-<!-- - **Persistance** : Option "Se souvenir de moi". -->
-- **Sécurité** : Récupération de mot de passe via processus sécurisé.
-- **Expérience Utilisateur** : Galerie interactive pour les animaux africains et génération de factures imprimables pour les visites effectuées.
-
----
-
+ 
  

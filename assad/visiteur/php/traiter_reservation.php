@@ -1,7 +1,7 @@
 <?php
 session_start();
 include "../../db_connect.php";
-
+ 
 $id_visiteur = $_SESSION['id_utilisateur'];
 
 $sql_status = "SELECT statut_utilisateur FROM utilisateurs WHERE id_utilisateur = ?";
