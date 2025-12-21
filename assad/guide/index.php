@@ -47,7 +47,7 @@ if (
     if ($count_res > 0)
         $star_total = $snbtar / (5 * $count_res);
 } else {
-    // Redirection de sécurité
+
     header("Location: ../connexion.php?error=access_denied");
     exit();
 }

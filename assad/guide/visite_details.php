@@ -32,6 +32,20 @@
             $resultat = $conn->query($sql);
             $nb_participants = $resultat->fetch_assoc()["nb_participants"];
         }
+
+        // Récupérer les commentaires .
+        $sql_comments = "SELECT c.*, u.nom_utilisateur 
+                 FROM commentaires c 
+                 INNER JOIN utilisateurs u ON c.id_utilisateur = u.id_utilisateur 
+                 WHERE c.id_visite = $tour_id 
+                 ORDER BY c.date_commentaire DESC";
+        $result_comments = $conn->query($sql_comments);
+        $comments = [];
+        if ($result_comments) {
+            while ($row = $result_comments->fetch_assoc()) {
+                $comments[] = $row;
+            }
+        }
     } else {
         header("Location: ../connexion.php?error=access_denied");
         exit();
@@ -115,49 +129,14 @@
 
  <body class="bg-background-light dark:bg-background-dark min-h-screen text-text-main-light dark:text-text-main-dark transition-colors duration-200">
      <div class="flex h-screen w-full overflow-hidden">
-         <aside class="hidden lg:flex flex-col w-72 border-r border-border-light dark:border-border-dark bg-background-light dark:bg-background-dark p-6 h-full justify-between">
-             <div class="flex flex-col gap-8">
-                 <div class="flex items-center gap-3 px-2">
-                     <div class="bg-primary/20 p-2 rounded-lg">
-                         <span class="material-symbols-outlined text-primary text-3xl">pets</span>
-                     </div>
-                     <div>
-                         <h1 class="text-xl font-bold tracking-tight">ASSAD</h1>
-                         <p class="text-text-sec-light dark:text-text-sec-dark text-xs uppercase tracking-wider font-semibold">Guide Space</p>
-                     </div>
-                 </div>
-                 <nav class="flex flex-col gap-2">
-                     <a class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-border-light dark:hover:bg-surface-dark transition-colors font-medium" href="index.php">
-                         <span class="material-symbols-outlined text-text-sec-light dark:text-text-sec-dark">dashboard</span>
-                         <span>Tableau de bord</span>
-                     </a>
-                     <a class="flex items-center gap-3 px-4 py-3 rounded-xl bg-primary/10 text-primary font-bold" href="#">
-                         <span class="material-symbols-outlined">map</span>
-                         <span>Mes Visites</span>
-                     </a>
-                     <a class="flex items-center gap-3 px-4 py-3 rounded-xl hover:bg-border-light dark:hover:bg-surface-dark transition-colors font-medium" href="reservations.php">
-                         <span class="material-symbols-outlined text-text-sec-light dark:text-text-sec-dark">groups</span>
-                         <span>Réservations</span>
-                     </a>
-                 </nav>
-             </div>
-             <div class="flex items-center gap-3 px-4 py-3 rounded-xl bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark shadow-sm">
-                 <div class="bg-primary/20 rounded-full h-10 w-10 flex items-center justify-center border-2 border-primary text-primary font-bold">
-                     <?= substr($nom_utilisateur, 0, 1) ?>
-                 </div>
-                 <div class="flex flex-col overflow-hidden">
-                     <p class="text-sm font-bold truncate"><?= $nom_utilisateur ?></p>
-                     <p class="text-text-sec-light dark:text-text-sec-dark text-xs truncate capitalize"><?= $role_utilisateur ?></p>
-                 </div>
-             </div>
-         </aside>
+
 
 
 
 
          <div class="flex h-screen w-full overflow-hidden">
 
-             <main class="flex-1 flex flex-col h-full overflow-y-auto overflow-x-hidden">
+             <main class="flex-1 flex flex-col h-fulloverflow-y-auto pr-4 custom-scrollbar overflow-x-hidden">
                  <div class="lg:hidden flex items-center justify-between p-4 border-b border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark sticky top-0 z-20">
                      <span class="material-symbols-outlined text-primary">pets</span>
                      <span class="material-symbols-outlined text-text-main-light dark:text-text-main-dark">menu</span>
@@ -174,18 +153,45 @@
                              <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight"><?= ($tour['titre_visite']) ?></h2>
                              <p class="text-text-sec-light dark:text-text-sec-dark text-lg">Détails de Visite #<?= $tour_id ?></p>
                          </div>
-
+                         <?php if (isset($_GET['success']) && $_GET['success'] == 'avis_ajoute'): ?>
+                             <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
+                                 Merci ! Votre avis a été enregistré avec succès.
+                             </div>
+                         <?php endif; ?>
 
                      </div>
 
                      <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
                          <div class="lg:col-span-1 flex flex-col gap-6">
-
+                             <?php
+                                $date_visite = strtotime($tour['dateheure_viste']);
+                                $maintenant = time();
+                                $is_full = $tour["capacite_max__visite"] <= $nb_participants;
+                                ?>
                              <div class="h-60 rounded-xl bg-cover bg-center relative shadow-lg border border-border-light dark:border-border-dark" style='background-image: url("<?= $image ?>");'>
-                                 <div class="m-3 absolute top-0 left-0 inline-flex px-3 py-1 bg-blue-600/90 backdrop-blur-sm text-white text-sm font-bold rounded-lg items-center gap-1">
+                                 <div class="m-3 absolute top-0 left-0 inline-flex px-3 py-1  backdrop-blur-sm text-white text-sm font-bold rounded-lg items-center gap-1">
                                      <span class="material-symbols-outlined text-[14px] leading-none">schedule</span>
-                                     <?= $tour['statut__visite'] ?>
+                                     <div class="h-48 sm:h-auto sm:w-48 rounded-xl bg-cover bg-center shrink-0 relative bg-gray-200"
+                                         style="background-image: url('../assets/img/habitats/<?= $visit['id_habitat'] ?? 'default' ?>.jpg');">
+
+                                         <?php if ($date_visite <= $maintenant && $date_visite > ($maintenant - 3600)) : ?>
+                                             <div class="m-2 absolute top-0 left-0 inline-flex px-2 py-1 bg-green-500/90 backdrop-blur-sm text-white text-xs font-bold rounded-lg items-center gap-1">
+                                                 <span class="w-2 h-2 rounded-full bg-white animate-pulse"></span>
+                                                 En direct
+                                             </div>
+                                         <?php elseif ($date_visite > $maintenant) : ?>
+                                             <div class="m-2 absolute top-0 left-0 inline-flex px-2 py-1 bg-blue-600/90 backdrop-blur-sm text-white text-xs font-bold rounded-lg items-center gap-1">
+                                                 <span class="material-symbols-outlined text-[14px] leading-none">schedule</span>
+                                                 Programmé
+                                             </div>
+                                         <?php else : ?>
+                                             <div class="m-2 absolute top-0 left-0 inline-flex px-2 py-1 bg-gray-500/90 backdrop-blur-sm text-white text-xs font-bold rounded-lg items-center gap-1">
+                                                 Terminé
+                                             </div>
+                                         <?php endif; ?>
+                                     </div>
+
                                  </div>
                              </div>
 
@@ -197,10 +203,7 @@
                                  <ul class="space-y-3 text-sm">
                                      <li class="flex justify-between items-center pb-1 border-b border-border-light dark:border-border-dark/50">
                                          <span class="text-text-sec-light dark:text-text-sec-dark font-medium">Date & Heure :</span>
-                                         <div>
-                                             <span class="font-semibold"><?= (new DateTime($tour['dateheure_viste']))->format('d-m-Y') ?> </span>
-                                             <p class="font-semibold"><?= " à " . (new DateTime($tour['dateheure_viste']))->format('H:i ')  ?></p>
-                                         </div>
+                                         <span class="font-semibold"><?= (new DateTime($tour['dateheure_viste']))->format('d M Y') ?> à <?= (new DateTime($tour['dateheure_viste']))->format('h:m ')  ?></span>
                                      </li>
                                      <li class="flex justify-between items-center pb-1 border-b border-border-light dark:border-border-dark/50">
                                          <span class="text-text-sec-light dark:text-text-sec-dark font-medium">Durée Estimée :</span>
@@ -224,6 +227,7 @@
                                  </h3>
                                  <p class="text-sm text-text-main-light/90 dark:text-text-main-dark/90"><?= (($tour['description_visite'])) ?></p>
                              </div>
+
                          </div>
 
                          <div class="lg:col-span-2 flex flex-col gap-6">
@@ -297,12 +301,12 @@
 
                                  <?php if (empty($array_etapes)): ?>
                                      <div class="p-6 text-center text-text-sec-light dark:text-text-sec-dark text-sm">
-                                         Aucun participant pour cette visite pour l'instant.
+                                         Aucun étapes pour cette visite pour l'instant.
                                      </div>
                                  <?php endif; ?>
 
                                  <!-- <div class="p-4 border-t border-border-light dark:border-border-dark/50 text-right">
-                                 <a href="reservations.php?tour_id=<?= $tour_id ?>" class="text-sm text-primary font-semibold hover:underline">
+                                 <a href="reservations.php?tour_id=?= $tour_id ?>" class="text-sm text-primary font-semibold hover:underline">
                                      Gérer toutes les réservations
                                      <span class="material-symbols-outlined text-[16px] align-middle ml-1">arrow_forward</span>
                                  </a>
@@ -314,8 +318,66 @@
 
                  </div>
              </main>
-         </div>
+             <div class="bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark shadow-sm p-6 mt-8">
+                 <h3 class="text-2xl font-bold mb-6 flex items-center gap-2">
+                     <span class="material-symbols-outlined text-primary">reviews</span>
+                     Avis des visiteurs (<?= count($comments) ?>)
+                 </h3>
 
+                 <div class="space-y-6 max-h-[100%]  min-w-[300px] max-w-[400px] overflow-y-auto pr-4 custom-scrollbar">
+                     <?php if (empty($comments)): ?>
+                         <p class="text-text-sec-light dark:text-text-sec-dark italic">Aucun avis pour le moment. Soyez le premier à donner votre avis !</p>
+                     <?php else: ?>
+                         <?php foreach ($comments as $comment): ?>
+                             <div class="border-b border-border-light dark:border-border-dark pb-6 last:border-0 last:pb-0">
+                                 <div class="flex justify-between items-start mb-2">
+                                     <div class="flex items-center gap-3">
+                                         <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold shrink-0">
+                                             <?= strtoupper(substr($comment['nom_utilisateur'], 0, 1)) ?>
+                                         </div>
+                                         <div>
+                                             <h4 class="font-bold text-text-main-light dark:text-text-main-dark"><?= ($comment['nom_utilisateur']) ?></h4>
+                                             <p class="text-xs text-text-sec-light"><?= date('d/m/Y-H:i', strtotime($comment['date_commentaire'])) ?></p>
+                                         </div>
+                                     </div>
+                                     <div class="flex text-yellow-500 shrink-0">
+                                         <?php for ($i = 1; $i <= 5; $i++): ?>
+                                             <span class="material-symbols-outlined text-[18px]">
+                                                 <?= $i <=intval( $comment['note']) ? 'star' : '' ?>
+                                             </span>
+                                         <?php endfor; ?>
+                                     </div>
+                                 </div>
+                                 <p class="text-text-main-light dark:text-text-main-dark mt-2 leading-relaxed text-sm">
+                                     <?= ($comment['texte']) ?>
+                                 </p>
+                             </div>
+                         <?php endforeach; ?>
+                     <?php endif; ?>
+                 </div>
+             </div>
+
+             <style>
+                 .custom-scrollbar::-webkit-scrollbar {
+
+                     width: 6px;
+                 }
+
+                 .custom-scrollbar::-webkit-scrollbar-track {
+                     background: transparent;
+                 }
+
+                 .custom-scrollbar::-webkit-scrollbar-thumb {
+                     background: #ec7f13;
+
+
+                 }
+
+                 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                     background: #d66a00;
+                 }
+             </style>
+         </div>
 
      </div>
 

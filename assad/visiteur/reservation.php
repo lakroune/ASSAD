@@ -1,7 +1,8 @@
  <?php
     session_start();
+    $image = "https://lh3.googleusercontent.com/aida-public/AB6AXuBB3mzttMFekKaHiUMQgz9CbcCvR-LHMfkNamiYLEoaa6mr4VX3RGazcvrLyN6USTeeR3THkb5RzRgunm2nxYGRlj0JP37XKsb0oTpMuUfgiqYzKIQpDFu5Cwamtq0rGjsH93RIdsA6guKSg4KakhrlAV6mKU_SZGX00TM6y3-uGVugQHONmrBvFsVLmZ73htnyBEHRcaZXZ-cwzOoPb7aiKe-dIsmCV4By1n5q6PJKo8CSmh3GTGb2hDjnxSb8_vhCsJz-sArwzoL6";
 
-    include "../db_connect.php";
+    require_once "../db_connect.php";
 
     if (
         isset($_SESSION['role_utilisateur'], $_SESSION['logged_in'], $_SESSION['id_utilisateur']) &&
@@ -29,7 +30,7 @@
 
 
 
-            
+
 
             // Filtre par typr guide_filter
             if (!empty($_POST['guide_filter'])) {
@@ -43,7 +44,6 @@
             $array_visites = array();
             while ($ligne =  $resultat->fetch_assoc())
                 array_push($array_visites, $ligne);
-            
         } catch (Exception $e) {
 
             error_log(date('Y-m-d H:i:s') . " - Erreur Recherche visite : " . $e->getMessage() . PHP_EOL, 3, "../error.log");
@@ -203,12 +203,12 @@
 
                             $date_visite = strtotime($visit['dateheure_viste']);
                             $maintenant = time();
-                            $is_full = $visit['capacite_max__visite'] <=$visit['nb_reservation'] ;
+                            $is_full = $visit['capacite_max__visite'] <= $visit['nb_reservation'];
                         ?>
-                         <div class="flex flex-col sm:flex-row gap-4 p-4 rounded-2xl bg-white dark:bg-zinc-800 border border-[#f3ede7] dark:border-zinc-700 shadow-md hover:shadow-lg transition-shadow duration-300 <?= $is_full ? 'opacity-75' : '' ?>">
+                         <div class="flex flex-col sm:flex-row gap-4 p-4 rounded-2xl bg-white dark:bg-zinc-800 border border-[#f3ede7] dark:border-zinc-700 shadow-md hover:shadow-lg transition-shadow duration-300 <?= $is_full ? 'opacity-50' : 'ee' ?>"  >
 
                              <div class="h-48 sm:h-auto sm:w-48 rounded-xl bg-cover bg-center shrink-0 relative bg-gray-200"
-                                 style="background-image: url('../assets/img/habitats/<?= $visit['id_habitat'] ?? 'default' ?>.jpg');">
+                                 style="background-image: url('<?= $image ?>');">
 
                                  <?php if ($date_visite <= $maintenant && $date_visite > ($maintenant - 3600)) : ?>
                                      <div class="m-2 absolute top-0 left-0 inline-flex px-2 py-1 bg-green-500/90 backdrop-blur-sm text-white text-xs font-bold rounded-lg items-center gap-1">
@@ -244,7 +244,7 @@
                                          </div>
                                          <div class="flex items-center gap-1">
                                              <span class="material-symbols-outlined text-primary text-[18px]">group</span>
-                                             <span><?= $is_full ? 'Complet' :( $visit["capacite_max__visite"]-  $visit["nb_reservation"]) . ' places dispo.' ?></span>
+                                             <span><?= $is_full ? 'Complet' : ($visit["capacite_max__visite"] -  $visit["nb_reservation"]) . ' places dispo.' ?></span>
                                          </div>
                                          <div class="flex items-center gap-1">
                                              <span class="material-symbols-outlined text-primary text-[18px]">payments</span>
@@ -259,7 +259,7 @@
                                          Détails
                                      </a>
 
-                                     <?php if (!$is_full && ( $date_visite > $maintenant )) : ?>
+                                     <?php if (!$is_full && ($date_visite > $maintenant)) : ?>
 
                                          <form action="php/traiter_reservation.php" method="POST" class="reservation-form">
                                              <input type="hidden" name="id_visite" value="<?= $visit['id_visite'] ?>">

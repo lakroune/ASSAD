@@ -1,4 +1,6 @@
 <?php
+$image = "https://lh3.googleusercontent.com/aida-public/AB6AXuBB3mzttMFekKaHiUMQgz9CbcCvR-LHMfkNamiYLEoaa6mr4VX3RGazcvrLyN6USTeeR3THkb5RzRgunm2nxYGRlj0JP37XKsb0oTpMuUfgiqYzKIQpDFu5Cwamtq0rGjsH93RIdsA6guKSg4KakhrlAV6mKU_SZGX00TM6y3-uGVugQHONmrBvFsVLmZ73htnyBEHRcaZXZ-cwzOoPb7aiKe-dIsmCV4By1n5q6PJKo8CSmh3GTGb2hDjnxSb8_vhCsJz-sArwzoL6";
+
 include "../db_connect.php";
 session_start();
 
@@ -23,7 +25,7 @@ if (
 
     while ($ligne = $resultat->fetch_assoc())
         $tours[] = $ligne;
-}else {
+} else {
 
     header("Location: ../connexion.php?error=access_denied");
     exit();
@@ -102,14 +104,14 @@ if (
                     </a>
                 </nav>
             </div>
-           <div class="border-t border-gray-200 dark:border-gray-800 pt-4 px-2">
-                 <div class="flex items-center gap-3">
+            <div class="border-t border-gray-200 dark:border-gray-800 pt-4 px-2">
+                <div class="flex items-center gap-3">
 
-                     <div class="flex flex-col">
-                         <a href="../php/seconnecter.php" class="text-xs text-text-secondary-light dark:text-text-secondary-dark">se deconnecter</a>
-                     </div>
-                 </div>
-             </div>
+                    <div class="flex flex-col">
+                        <a href="../php/seconnecter.php" class="text-xs text-text-secondary-light dark:text-text-secondary-dark">se deconnecter</a>
+                    </div>
+                </div>
+            </div>
         </aside>
 
         <main class="flex-1 flex flex-col h-full overflow-y-auto">
@@ -132,8 +134,9 @@ if (
 
                     <?php foreach ($tours as $tour) : ?>
                         <div class="flex flex-col sm:flex-row gap-4 p-4 rounded-2xl bg-surface-light dark:bg-surface-dark border border-border-light dark:border-border-dark shadow-md">
-                            <div class="h-32 sm:w-32 rounded-xl bg-primary/10 flex items-center justify-center shrink-0">
-                                <span class="material-symbols-outlined text-primary text-4xl">image</span>
+                            <div class="h-32 sm:w-32 rounded-xl bg-primary/10 flex items-center justify-center shrink-0" style="background-image:url(<?= $image ?>) ; background-size:cover; background-position:center;">
+                                <!-- <span class="material-symbols-outlined text-primary text-5xl opacity-50">map</span> -->
+
                             </div>
 
                             <div class="flex flex-col justify-between flex-1 gap-2">
@@ -141,11 +144,11 @@ if (
                                     <div class="flex justify-between">
                                         <h4 class="text-xl font-bold text-primary"><?= ($tour['titre_visite']) ?></h4>
                                         <?php
-                                        if ($tour['statut__visite'] == 0)
+                                        if (strtotime($tour['dateheure_viste']) > time())
 
-                                            echo '<span class="text-xs font-bold px-2 py-1 bg-green-100 text-green-700 rounded-lg">Actif</span>';
+                                            echo '<span class="text-xs font-bold px-2 py-1 bg-green-100 text-green-700 rounded-lg">Programmé</span>';
                                         else
-                                            echo '<span class="text-xs font-bold px-2 py-1 bg-green-100 text-green-700 rounded-lg">pas disponible</span>';
+                                            echo '<span class="text-xs font-bold px-2 py-1 bg-gray-100 text-gray-700 rounded-lg">Terminé</span>';
 
                                         ?>
 
@@ -155,7 +158,7 @@ if (
                                     <div class="flex flex-wrap gap-4 mt-3 text-xs font-medium text-text-sec-light dark:text-text-sec-dark">
                                         <div class="flex items-center gap-1">
                                             <span class="material-symbols-outlined text-sm">calendar_today</span>
-                                            <?= date('d M Y H:i', strtotime($tour['dateheure_viste'])) ?>
+                                            <?= date('d M Y  / H:i', strtotime($tour['dateheure_viste'])) ?>
                                         </div>
                                         <div class="flex items-center gap-1">
                                             <span class="material-symbols-outlined text-sm">payments</span>

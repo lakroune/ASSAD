@@ -188,8 +188,8 @@ if (
                                             <div class="text-sm text-text-main-light dark:text-text-main-dark line-clamp-1"><?= ($participant['titre_visite']) ?></div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap">
-                                            <div class="text-sm text-text-main-light dark:text-text-main-dark"><?= (new DateTime($participant['dateheure_viste']))->format('d M Y') ?></div>
-                                            <div class="text-xs text-text-sec-light dark:text-text-sec-dark"><?= (new DateTime($participant['dateheure_viste']))->format('h : m')  ?></div>
+                                            <div class="text-sm text-text-main-light dark:text-text-main-dark"><?= (new DateTime($participant['date_reservation']))->format('d M Y') ?></div>
+                                            <div class="text-xs text-text-sec-light dark:text-text-sec-dark"><?= (new DateTime($participant['date_reservation']))->format('H :i')  ?></div>
                                         </td>
                                         <td class="px-6 py-4 whitespace-nowrap text-center">
                                             <span class="text-sm font-bold"><?= ($participant['nb_personnes']) ?></span>

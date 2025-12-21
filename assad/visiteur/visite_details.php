@@ -34,6 +34,48 @@
             $resultat = $conn->query($sql);
             $nb_participants = $resultat->fetch_assoc()["nb_participants"];
         }
+
+
+        //
+        $can_comment = false;
+        $check_res_sql = "SELECT id_reservations FROM reservations 
+                  WHERE id_visite = $tour_id 
+                  AND id_utilisateur = $id_utilisateur 
+                  LIMIT 1";
+        $res_check = $conn->query($check_res_sql);
+
+
+        // Vérifier si la visite est passee et si l'utilisateur a deja commente
+        if ($res_check->num_rows > 0) {
+            $date_visite_timestamp = strtotime($tour['dateheure_viste']);
+            if ($date_visite_timestamp < time()) {
+
+                $check_comment_sql = "SELECT id_commentaire FROM commentaires 
+                              WHERE id_visite = $tour_id 
+                              AND id_utilisateur = $id_utilisateur 
+                              LIMIT 1";
+                $comment_check = $conn->query($check_comment_sql);
+
+                if ($comment_check->num_rows == 0) {
+                    $can_comment = true;
+                } else {
+                    $has_already_commented = true;
+                }
+            }
+        }
+        // Récupérer les commentaires .
+        $sql_comments = "SELECT c.*, u.nom_utilisateur 
+                 FROM commentaires c 
+                 INNER JOIN utilisateurs u ON c.id_utilisateur = u.id_utilisateur 
+                 WHERE c.id_visite = $tour_id 
+                 ORDER BY c.date_commentaire DESC";
+        $result_comments = $conn->query($sql_comments);
+        $comments = [];
+        if ($result_comments) {
+            while ($row = $result_comments->fetch_assoc()) {
+                $comments[] = $row;
+            }
+        }
     } else {
         header("Location: ../connexion.php?error=access_denied");
         exit();
@@ -143,7 +185,7 @@
      </header>
      <div class="flex h-screen w-full overflow-hidden">
 
-         <main class="flex-1 flex flex-col h-full overflow-y-auto overflow-x-hidden">
+         <main class="flex-1 flex flex-col h-fulloverflow-y-auto pr-4 custom-scrollbar overflow-x-hidden">
              <div class="lg:hidden flex items-center justify-between p-4 border-b border-border-light dark:border-border-dark bg-surface-light dark:bg-surface-dark sticky top-0 z-20">
                  <span class="material-symbols-outlined text-primary">pets</span>
                  <span class="material-symbols-outlined text-text-main-light dark:text-text-main-dark">menu</span>
@@ -160,7 +202,11 @@
                          <h2 class="text-3xl md:text-4xl font-extrabold tracking-tight"><?= ($tour['titre_visite']) ?></h2>
                          <p class="text-text-sec-light dark:text-text-sec-dark text-lg">Détails de Visite #<?= $tour_id ?></p>
                      </div>
-
+                     <?php if (isset($_GET['success']) && $_GET['success'] == 'avis_ajoute'): ?>
+                         <div class="bg-green-100 border border-green-400 text-green-700 px-4 py-3 rounded relative mb-4">
+                             Merci ! Votre avis a été enregistré avec succès.
+                         </div>
+                     <?php endif; ?>
 
                  </div>
 
@@ -168,9 +214,9 @@
 
                      <div class="lg:col-span-1 flex flex-col gap-6">
                          <?php
-                            $date_visite = strtotime($visit['dateheure_viste']?? time());
+                            $date_visite = strtotime($tour['dateheure_viste'] ?? time());
                             $maintenant = time();
-                            $is_full = 11 <= 0;
+                            $is_full = $tour["capacite_max__visite"] <= $nb_participants;
                             ?>
                          <div class="h-60 rounded-xl bg-cover bg-center relative shadow-lg border border-border-light dark:border-border-dark" style='background-image: url("<?= $image ?>");'>
                              <div class="m-3 absolute top-0 left-0 inline-flex px-3 py-1  backdrop-blur-sm text-white text-sm font-bold rounded-lg items-center gap-1">
@@ -229,6 +275,49 @@
                                  Description
                              </h3>
                              <p class="text-sm text-text-main-light/90 dark:text-text-main-dark/90"><?= (($tour['description_visite'])) ?></p>
+                         </div>
+                         <div class="mt-6">
+                             <?php if ($can_comment) : ?>
+                                 <div class="bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark shadow-sm p-5">
+                                     <h3 class="text-xl font-bold mb-4 flex items-center gap-2 text-primary">
+                                         <span class="material-symbols-outlined">rate_review</span>
+                                         Laissez un avis
+                                     </h3>
+                                     <form action="php/ajouter_commentaire.php" method="POST" class="flex flex-col gap-4">
+                                         <input type="hidden" name="id_visite" value="<?= $tour_id ?>">
+
+                                         <div>
+                                             <label class="block text-sm font-medium mb-1">Note (1-5)</label>
+                                             <div class="flex gap-2">
+                                                 <?php for ($i = 1; $i <= 5; $i++): ?>
+                                                     <label class="cursor-pointer">
+                                                         <input type="radio" name="note" value="<?= $i ?>" class="hidden peer" required>
+                                                         <span class="material-symbols-outlined text-gray-300 peer-checked:text-yellow-500 hover:text-yellow-400 transition-colors">star</span>
+                                                     </label>
+                                                 <?php endfor; ?>
+                                             </div>
+                                         </div>
+
+                                         <div>
+                                             <label for="commentaire" class="block text-sm font-medium mb-1">Votre commentaire</label>
+                                             <textarea name="commentaire" id="commentaire" rows="3" class="w-full rounded-lg border-border-light dark:border-border-dark dark:bg-background-dark" required></textarea>
+                                         </div>
+
+                                         <button type="submit" class="bg-primary text-white font-bold py-2 px-4 rounded-lg hover:opacity-90">
+                                             Envoyer mon avis
+                                         </button>
+                                     </form>
+                                 </div>
+
+                             <?php elseif (isset($has_already_commented) && $has_already_commented) : ?>
+                                 <div class="p-4 bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-lg flex items-center gap-3">
+                                     <span class="material-symbols-outlined text-blue-600">info</span>
+                                     <p class="text-sm text-blue-800 dark:text-blue-300 font-medium">
+                                         Vous avez déjà partagé votre expérience sur cette visite. Merci pour votre avis !
+                                     </p>
+                                 </div>
+
+                             <?php endif; ?>
                          </div>
                      </div>
 
@@ -320,6 +409,65 @@
 
              </div>
          </main>
+         <div class="bg-surface-light dark:bg-surface-dark rounded-xl border border-border-light dark:border-border-dark shadow-sm p-6 mt-8">
+             <h3 class="text-2xl font-bold mb-6 flex items-center gap-2">
+                 <span class="material-symbols-outlined text-primary">reviews</span>
+                 Avis des visiteurs (<?= count($comments) ?>)
+             </h3>
+
+             <div class="space-y-6 max-h-[100%]  min-w-[300px] max-w-[400px] overflow-y-auto pr-4 custom-scrollbar">
+                 <?php if (empty($comments)): ?>
+                     <p class="text-text-sec-light dark:text-text-sec-dark italic">Aucun avis pour le moment. Soyez le premier à donner votre avis !</p>
+                 <?php else: ?>
+                     <?php foreach ($comments as $comment): ?>
+                         <div class="border-b border-border-light dark:border-border-dark pb-6 last:border-0 last:pb-0">
+                             <div class="flex justify-between items-start mb-2">
+                                 <div class="flex items-center gap-3">
+                                     <div class="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary font-bold shrink-0">
+                                         <?= strtoupper(substr($comment['nom_utilisateur'], 0, 1)) ?>
+                                     </div>
+                                     <div>
+                                         <h4 class="font-bold text-text-main-light dark:text-text-main-dark"><?= ($comment['nom_utilisateur']) ?></h4>
+                                         <p class="text-xs text-text-sec-light"><?= date('d/m/Y-H/i', strtotime($comment['date_commentaire'])) ?></p>
+                                     </div>
+                                 </div>
+                                 <div class="flex text-yellow-500 shrink-0">
+                                     <?php for ($i = 1; $i <= 5; $i++): ?>
+                                         <span class="material-symbols-outlined text-[18px]">
+                                             <?= $i <= $comment['note'] ? 'star' : '' ?>
+                                         </span>
+                                     <?php endfor; ?>
+                                 </div>
+                             </div>
+                             <p class="text-text-main-light dark:text-text-main-dark mt-2 leading-relaxed text-sm">
+                                 <?= ($comment['texte']) ?>
+                             </p>
+                         </div>
+                     <?php endforeach; ?>
+                 <?php endif; ?>
+             </div>
+         </div>
+
+         <style>
+             .custom-scrollbar::-webkit-scrollbar {
+
+                 width: 6px;
+             }
+
+             .custom-scrollbar::-webkit-scrollbar-track {
+                 background: transparent;
+             }
+
+             .custom-scrollbar::-webkit-scrollbar-thumb {
+                 background: #ec7f13;
+                 /* لون الـ primary الخاص بك */
+
+             }
+
+             .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+                 background: #d66a00;
+             }
+         </style>
      </div>
 
      <!-- <script>
