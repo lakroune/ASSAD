@@ -158,7 +158,7 @@
                                  <?php foreach ($array_reservations as $reservation) : ?>
                                      <tr class="<?= $reservation['statut__visite'] ? 'bg-white hover:bg-orange-50/50' : 'bg-gray-50/50' ?> transition-colors">
                                          <td class="px-6 py-4 whitespace-nowrap text-sm font-medium text-[#1b140d]">
-                                             <a href="reservation.php" class="hover:text-primary transition-colors">
+                                             <a href="./visite_details.php?id=<?= $reservation["id_visite"] ?>" class="hover:text-primary transition-colors">
                                                  <?= ($reservation['titre_visite']) ?>
                                              </a>
                                              <p class="text-xs text-gray-400">#<?= ($reservation['id_reservations']) ?></p>

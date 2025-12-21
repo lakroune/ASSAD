@@ -17,7 +17,7 @@
         $role_utilisateur = ($_SESSION['role_utilisateur']);
         $tour_id = $_GET['id'];
 
-        $sql = " select * from  visitesguidees  inner join  utilisateurs  on id_utilisateur =  id_guide and id_visite = $tour_id";
+        $sql = " select * from  visitesguidees v  inner join  utilisateurs u on u.id_utilisateur =  v.id_guide where v.id_visite = $tour_id";
         $resultat = $conn->query($sql);
 
         $tour = array();
@@ -307,12 +307,12 @@
                                  </div>
                              <?php endif; ?>
 
-                             <div class="p-4 border-t border-border-light dark:border-border-dark/50 text-right">
-                                 <a href="reservations.php?tour_id=<?= $tour_id ?>" class="text-sm text-primary font-semibold hover:underline">
+                             <!-- <div class="p-4 border-t border-border-light dark:border-border-dark/50 text-right">
+                                 <a href="reservations.php?tour_id=?= $tour_id ?>" class="text-sm text-primary font-semibold hover:underline">
                                      Gérer toutes les réservations
                                      <span class="material-symbols-outlined text-[16px] align-middle ml-1">arrow_forward</span>
                                  </a>
-                             </div>
+                             </div> -->
                          </div>
                      </div>
                  </div>

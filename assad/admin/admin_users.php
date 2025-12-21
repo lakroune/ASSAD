@@ -302,7 +302,7 @@
                                                  <?php endif; ?>
 
                                                  <?php if ($user['role'] === 'guide' && $user['Approuver_utilisateur'] == 0): ?>
-                                                     <form action="" method="POST" class="Approuver_utilisateur">
+                                                     <form action="" method="POST" class="Approuver">
                                                          <input type="hidden" name="id_Approuver_utilisateur" value="<?= $user['id_utilisateur'] ?>">
                                                          <button type="button"
                                                              class="p-1.5 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-red-500"
@@ -433,6 +433,15 @@
                  const form = ele_click.closest('form.lock');
                  if (form)
                      if (confirm("Voulez-vous vraiment activer cet utilisateur"))
+                         form.submit();
+             }
+         });
+         document.getElementById('card-user').addEventListener('click', (e) => {
+             const ele_click = e.target;
+             if (ele_click.tagName === 'SPAN') {
+                 const form = ele_click.closest('form.Approuver');
+                 if (form)
+                     if (confirm("Voulez-vous vraiment Approuver ce guide"))
                          form.submit();
              }
          });

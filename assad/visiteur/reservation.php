@@ -23,34 +23,30 @@
         while ($ligne =  $resultat->fetch_assoc())
             array_push($array_guides, $ligne);
 
-        $sql = "SELECT * FROM visitesguidees  WHERE 1=1";
+        $sql = "SELECT v.* ,sum(r.nb_personnes) as nb_reservation FROM visitesguidees v LEFT JOIN reservations r on r.id_visite=v.id_visite WHERE 1=1";
 
         if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 
 
-            // filter par date_filter
-            if (!empty($_POST['date_filter'])) {
-                $sql .= " AND dateheure_viste <= " . $_POST['date_filter'];
-            }
+            
 
             // Filtre par typr guide_filter
             if (!empty($_POST['guide_filter'])) {
                 $sql .= " AND id_guide = '" . $_POST['guide_filter'] . "'";
             }
         }
+        $sql .= " group by v.id_visite order by nb_reservation ,v.capacite_max__visite asc ";
 
         try {
             $resultat = $conn->query($sql);
             $array_visites = array();
             while ($ligne =  $resultat->fetch_assoc())
                 array_push($array_visites, $ligne);
+            
         } catch (Exception $e) {
 
             error_log(date('Y-m-d H:i:s') . " - Erreur Recherche visite : " . $e->getMessage() . PHP_EOL, 3, "../error.log");
-            $array_visites = array();
-            while ($ligne =  $resultat->fetch_assoc())
-                array_push($array_visites, $ligne);
         }
     } else {
         header("Location: ../connexion.php?error=access_denied");
@@ -183,7 +179,7 @@
                  <form method="POST" action="" class="flex flex-col md:flex-row justify-between items-center gap-4 p-4 bg-white rounded-xl shadow-lg border border-[#f3ede7] mb-8">
                      <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 w-full">
                          <div class="relative">
-                             <input type="date" name="date_filter" value="<?= $_POST['date_filter'] ?? date('Y-m-d') ?>"
+                             <input type="date" disabled name="date_filter" value="<?= $_POST['date_filter'] ?? date('Y-m-d') ?>"
                                  class="px-4 py-2 border border-gray-200 rounded-lg bg-white text-sm focus:ring-primary w-full" />
                          </div>
 
@@ -207,7 +203,7 @@
 
                             $date_visite = strtotime($visit['dateheure_viste']);
                             $maintenant = time();
-                            $is_full = 11 <= 0;
+                            $is_full = $visit['capacite_max__visite'] <=$visit['nb_reservation'] ;
                         ?>
                          <div class="flex flex-col sm:flex-row gap-4 p-4 rounded-2xl bg-white dark:bg-zinc-800 border border-[#f3ede7] dark:border-zinc-700 shadow-md hover:shadow-lg transition-shadow duration-300 <?= $is_full ? 'opacity-75' : '' ?>">
 
@@ -248,7 +244,7 @@
                                          </div>
                                          <div class="flex items-center gap-1">
                                              <span class="material-symbols-outlined text-primary text-[18px]">group</span>
-                                             <span><?= $is_full ? 'Complet' : $visit["capacite_max__visite"] . ' places dispo.' ?></span>
+                                             <span><?= $is_full ? 'Complet' :( $visit["capacite_max__visite"]-  $visit["nb_reservation"]) . ' places dispo.' ?></span>
                                          </div>
                                          <div class="flex items-center gap-1">
                                              <span class="material-symbols-outlined text-primary text-[18px]">payments</span>
@@ -263,7 +259,7 @@
                                          Détails
                                      </a>
 
-                                     <?php if (!$is_full) : ?>
+                                     <?php if (!$is_full && ( $date_visite > $maintenant )) : ?>
 
                                          <form action="php/traiter_reservation.php" method="POST" class="reservation-form">
                                              <input type="hidden" name="id_visite" value="<?= $visit['id_visite'] ?>">
@@ -273,7 +269,7 @@
                                                  <input type="number" name="nb_personnes" min="1" max="10" value="1"
                                                      class="w-16 px-2 py-2 border border-gray-200 rounded-lg text-sm" required>
 
-                                                 <button type="submit" class="flex items-center gap-2 px-4 py-2 rounded-lg border border-primary text-primary text-sm font-semibold hover:bg-primary/10 transition-colors">
+                                                 <button <?php if ($is_full) echo "disabled" ?> type="submit" class="flex items-center gap-2 px-4 py-2 rounded-lg border border-primary text-primary text-sm font-semibold hover:bg-primary/10 transition-colors">
                                                      <span class="material-symbols-outlined text-[18px]">confirmation_number</span>
                                                      Réserver
                                                  </button>
